@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealTimeChatApi", "RealTimeChatApi.csproj", "{DA34E5D2-12AD-4437-AB26-2EB1024531CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealTimeChatApi", "RealTimeChatApi.csproj", "{9089595D-9414-4AA9-9506-74B722A93801}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DA34E5D2-12AD-4437-AB26-2EB1024531CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA34E5D2-12AD-4437-AB26-2EB1024531CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA34E5D2-12AD-4437-AB26-2EB1024531CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA34E5D2-12AD-4437-AB26-2EB1024531CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9089595D-9414-4AA9-9506-74B722A93801}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9089595D-9414-4AA9-9506-74B722A93801}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9089595D-9414-4AA9-9506-74B722A93801}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9089595D-9414-4AA9-9506-74B722A93801}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {1D974905-203C-429F-A63A-1F4D27FF18BB}
+		SolutionGuid = {BC08B8B7-8078-45F6-949B-34CDC92EC239}
 	EndGlobalSection
 EndGlobal
