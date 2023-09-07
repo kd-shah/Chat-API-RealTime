@@ -1,4 +1,7 @@
 
+using Microsoft.AspNetCore.Identity;
+using RealTimeChatApi.DataAccessLayer.Data;
+
 namespace RealTimeChatApi
 {
     public class Program
@@ -13,6 +16,16 @@ namespace RealTimeChatApi
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            //builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+            //.AddEntityFrameworkStores<RealTimeChatDbContext>()
+            //.AddDefaultTokenProviders();
+            //builder.Services.AddScoped<UserManager<IdentityUser>>();
+            //builder.Services.AddScoped<SignInManager<IdentityUser>>();
+
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+        .AddEntityFrameworkStores<RealTimeChatDbContext>()
+        .AddDefaultTokenProviders();
 
             var app = builder.Build();
 
