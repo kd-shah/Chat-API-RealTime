@@ -1,6 +1,17 @@
 
 using Microsoft.AspNetCore.Identity;
+using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Data;
+using RealTimeChatApi.DataAccessLayer.Models;
+using RealTimeChatApi.BusinessLogicLayer.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using RealTimeChatApi.DataAccessLayer.Interfaces;
+using RealTimeChatApi.DataAccessLayer.Repositories;
 
 namespace RealTimeChatApi
 {
@@ -13,19 +24,60 @@ namespace RealTimeChatApi
             // Add services to the container.
 
             builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            //builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-            //.AddEntityFrameworkStores<RealTimeChatDbContext>()
-            //.AddDefaultTokenProviders();
-            //builder.Services.AddScoped<UserManager<IdentityUser>>();
-            //builder.Services.AddScoped<SignInManager<IdentityUser>>();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                options.OperationFilter<SecurityRequirementsOperationFilter>();
+            });
 
-            builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-        .AddEntityFrameworkStores<RealTimeChatDbContext>()
-        .AddDefaultTokenProviders();
+            //builder.Services.AddDbContext<RealTimeChatDbContext>(options =>
+            //{
+            //    options.UseInMemoryDatabase("InMemoryDatabase"); // Provide a unique name
+            //});
+            var connectionString = builder.Configuration.GetConnectionString("RealTimeChatDbContext");
+            builder.Services.AddDbContext<RealTimeChatDbContext>(options =>
+            {
+                options.UseSqlServer(connectionString);
+            });
+
+
+            builder.Services.AddIdentity<AppUser, IdentityRole>()
+            .AddEntityFrameworkStores<RealTimeChatDbContext>()
+            .AddDefaultTokenProviders();
+
+            builder.Services.AddTransient<IUserService, UserService>();
+            //builder.Services.AddTransient<UserService>();
+            builder.Services.AddTransient<IUserRepository, UserRepository>();
+            builder.Services.AddTransient<IUserService, UserService>();
+
+
+            builder.Services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("It Is A Secret Key Which Should Not Be Shared With Other Users.....")),
+                    ValidateAudience = false,
+                    ValidateIssuer = false,
+                };
+            }
+            );
+
 
             var app = builder.Build();
 
@@ -37,6 +89,8 @@ namespace RealTimeChatApi
             }
 
             app.UseHttpsRedirection();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

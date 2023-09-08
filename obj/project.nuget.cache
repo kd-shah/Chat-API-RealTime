@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "vmyejOqrzpRWenYPhI5wsplOnL/fbsNOIXYQDgkt+Y6dRshiB9CAtAeCN6sDe32ngD19E5Ei9S6iHHrjFg5yDA==",
+  "dgSpecHash": "cXM3LfSKd4eGYa8URKHm3b6AnwD5mPLxMiH1GD8lD3KllPKxRZhaUxDuRl8ya2TEe57LUCZuUh1vnq2UVqeSJA==",
   "success": true,
   "projectFilePath": "C:\\Users\\promact\\Desktop\\Internship\\Chat Application RealTime\\Backend\\RealTimeChatApi\\RealTimeChatApi.csproj",
   "expectedPackageFiles": [
@@ -21,6 +21,7 @@
     "C:\\Users\\promact\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\7.0.10\\microsoft.entityframeworkcore.abstractions.7.0.10.nupkg.sha512",
     "C:\\Users\\promact\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\7.0.10\\microsoft.entityframeworkcore.analyzers.7.0.10.nupkg.sha512",
     "C:\\Users\\promact\\.nuget\\packages\\microsoft.entityframeworkcore.design\\7.0.10\\microsoft.entityframeworkcore.design.7.0.10.nupkg.sha512",
+    "C:\\Users\\promact\\.nuget\\packages\\microsoft.entityframeworkcore.inmemory\\7.0.10\\microsoft.entityframeworkcore.inmemory.7.0.10.nupkg.sha512",
     "C:\\Users\\promact\\.nuget\\packages\\microsoft.entityframeworkcore.relational\\7.0.10\\microsoft.entityframeworkcore.relational.7.0.10.nupkg.sha512",
     "C:\\Users\\promact\\.nuget\\packages\\microsoft.entityframeworkcore.sqlserver\\7.0.10\\microsoft.entityframeworkcore.sqlserver.7.0.10.nupkg.sha512",
     "C:\\Users\\promact\\.nuget\\packages\\microsoft.entityframeworkcore.tools\\7.0.10\\microsoft.entityframeworkcore.tools.7.0.10.nupkg.sha512",

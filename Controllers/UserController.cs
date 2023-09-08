@@ -1,14 +1,6 @@
-﻿using RealTimeChatApi.Helper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using RealTimeChatApi.DataAccessLayer.Models;
-using RealTimeChatApi.BusinessLogicLayer.Services;
 using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using Microsoft.AspNetCore.Identity;
@@ -20,8 +12,8 @@ namespace RealTimeChatApi.Controllers
     public class UserController : ControllerBase
     {
         public readonly IUserService _userService;
-        private readonly UserManager<IdentityUSer> _userManager;
-        private readonly SignInManager<IdentityUSer> _signInManager;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
 
         public UserController(IUserService userService)
         {
@@ -37,6 +29,19 @@ namespace RealTimeChatApi.Controllers
 
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> Authenticate([FromBody] LoginRequestDto UserObj)
+        {
+            return await _userService.Authenticate(UserObj);
+        }
+
+        [Authorize]
+        [HttpGet("users")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+
+            return await _userService.GetAllUsers();
+        }
 
     }
 }

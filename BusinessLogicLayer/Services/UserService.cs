@@ -10,22 +10,21 @@ using Microsoft.AspNetCore.Mvc;
 using RealTimeChatApi.DataAccessLayer.Models;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using Microsoft.AspNetCore.Identity;
+using RealTimeChatApi.BusinessLogicLayer.Interfaces;
+using RealTimeChatApi.DataAccessLayer.Interfaces;
 
 namespace RealTimeChatApi.BusinessLogicLayer.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
-        public readonly RealTimeChatDbContext _authContext;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        public UserService(RealTimeChatDbContext chatDbContext, IHttpContextAccessor httpContextAccessor, 
-            UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+       
+        
+        private readonly IUserRepository _userRepository;
+        public UserService( IUserRepository userRepository)
         {
-            _authContext = chatDbContext;
-            _httpContextAccessor = httpContextAccessor;
-            _userManager = userManager;
-            _signInManager = signInManager;
+           
+           
+            _userRepository = userRepository;
         }
 
         public async Task<IActionResult> RegisterUserAsync([FromBody] RegisterRequestDto UserObj)
@@ -41,32 +40,129 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 return new BadRequestObjectResult(new { Message = "Invalid password format" });
 
             // Check if the user already exists
-            var existingUser = await _userManager.FindByEmailAsync(UserObj.email);
-            if (existingUser != null)
+            var existingUser = await _userRepository.CheckExistingEmail(UserObj);
+            
+            //var existingUser = await _userManager.FindByEmailAsync(UserObj.email);
+            if (existingUser)
                 return new ConflictObjectResult(new { message = "Registration failed because the email is already registered" });
 
 
-            var newUser = new IdentityUser
+            var newUser = new AppUser
             {
-                UserName = UserObj.name,
+                Name = UserObj.name,
+                UserName = UserObj.email,
                 Email = UserObj.email,
-                //password = UserObj.password,
-                //Token = ""
+                Token = ""
 
             };
 
-            var result = await _userManager.CreateAsync(newUser, UserObj.password);
+            //var result = await _userManager.CreateAsync(newUser, UserObj.password);
+            var result = await _userRepository.RegisterUserAsync(newUser, UserObj);
 
             if (result.Succeeded)
             {
-                // User registration successful
-                return new OkObjectResult(new { Message = "User Registered" });
+                
+                return new OkObjectResult(new { Message = "User Registered", newUser });
             }
             else
             {
-                // User registration failed
                 return new BadRequestObjectResult(new { Message = "User registration failed", Errors = result.Errors });
             }
+        }
+
+
+        public async Task<IActionResult> Authenticate([FromBody] LoginRequestDto UserObj)
+        {
+            if (UserObj == null)
+                return new BadRequestObjectResult(new { Message = "Invalid request" });
+
+            if (!IsValidEmail(UserObj.email))
+                return new BadRequestObjectResult(new { Message = "Invalid email format" });
+
+            // Use UserManager to find the user by email
+            var user = await _userRepository.CheckEmail(UserObj);
+            //var user = await _userManager.FindByEmailAsync(UserObj.email);
+            if (user == null)
+                return new NotFoundObjectResult(new { Message = "Login failed due to incorrect credentials" });
+
+            // Use SignInManager to check the user's password
+            //var result = await _signInManager.CheckPasswordSignInAsync(user, UserObj.password, lockoutOnFailure: false);
+            var result = await _userRepository.Authenticate(user, UserObj);
+
+            if (result.Succeeded)
+            {
+                // Authentication succeeded, you can generate a token or return additional user information here.
+                var response = new LoginResponseDto
+                {
+                    name = user.Name,
+                    email = user.Email,
+                    token = CreateJwt(user)
+                };
+
+                // Generate a token or perform any other post-authentication logic
+
+                return new OkObjectResult(new
+                {
+                    Message = "Login Success",
+                    UserInfo = response, 
+                });
+            }
+            else
+            {
+                // Authentication failed
+                return new BadRequestObjectResult(new
+                {
+                    Message = "Incorrect Password or Invalid Credentials"
+                });
+            }
+
+        }
+
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var currentUser = await GetCurrentUser();
+
+            if (currentUser.Id == null)
+            {
+                return new BadRequestObjectResult(new { Message = "Unable to retrieve current user." });
+            }
+
+            var userList = await _userRepository.GetAllUsers(currentUser.Id);
+
+
+            return new OkObjectResult(new { users = userList });
+        }
+
+        public async Task<AppUser> GetCurrentUser()
+        {
+            return await _userRepository.GetCurrentUser();
+        }
+
+        private string CreateJwt(AppUser user)
+        {
+            var jwtTokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes("It Is A Secret Key Which Should Not Be Shared With Other Users.....");
+
+            var claims = new List<Claim>
+    {
+            new Claim(ClaimTypes.Name, user.Name),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+    };
+            var identity = new ClaimsIdentity(claims);
+
+
+            var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = identity,
+                Expires = DateTime.Now.AddDays(1),
+                SigningCredentials = credentials,
+            };
+
+            var token = jwtTokenHandler.CreateToken(tokenDescriptor);
+
+            return jwtTokenHandler.WriteToken(token);
         }
 
         private bool IsValidEmail(string email)
@@ -83,17 +179,5 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             return true;
         }
 
-        //private IdentityUser GetCurrentLoggedInUser()
-        //{
-        //    var userIdClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-
-        //    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
-        //    {
-        //        var currentUser = _authContext.Users.FirstOrDefault(u => u.userId == userId);
-        //        return currentUser;
-        //    }
-
-        //    return null;
-        //}
     }
 }

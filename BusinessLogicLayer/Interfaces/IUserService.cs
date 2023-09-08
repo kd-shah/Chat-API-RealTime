@@ -7,5 +7,9 @@ namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
     public interface IUserService
     {
         Task<IActionResult> RegisterUserAsync(RegisterRequestDto UserObj);
+
+        Task<IActionResult> Authenticate(LoginRequestDto UserObj);
+
+        Task<IActionResult> GetAllUsers();
     }
 }

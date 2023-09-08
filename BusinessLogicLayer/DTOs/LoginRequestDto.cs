@@ -1,6 +1,6 @@
 ﻿namespace RealTimeChatApi.BusinessLogicLayer.DTOs
 {
-    public class LoginDto
+    public class LoginRequestDto
     {
         public string email { get; set; }
 
