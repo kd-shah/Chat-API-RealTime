@@ -9,7 +9,7 @@ namespace RealTimeChatApi.DataAccessLayer.Models
       
         public string Token { get; set; }
 
-        //public virtual ICollection<Message>? sentMessages { get; set; }
-        //public virtual ICollection<Message>? receivedMessages { get; set; }
+        public virtual ICollection<Message>? sentMessages { get; set; }
+        public virtual ICollection<Message>? receivedMessages { get; set; }
     }
 }

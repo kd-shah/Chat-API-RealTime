@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Repositories;
+using RealTimeChatApi.Middleware;
 
 namespace RealTimeChatApi
 {
@@ -55,9 +56,11 @@ namespace RealTimeChatApi
             .AddDefaultTokenProviders();
 
             builder.Services.AddTransient<IUserService, UserService>();
-            //builder.Services.AddTransient<UserService>();
             builder.Services.AddTransient<IUserRepository, UserRepository>();
-            builder.Services.AddTransient<IUserService, UserService>();
+            
+            
+            builder.Services.AddScoped<IMessageService, MessageService>();
+            IServiceCollection serviceCollection = builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 
             builder.Services.AddAuthentication(x =>
@@ -93,6 +96,8 @@ namespace RealTimeChatApi
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseRequestLoggingMiddleware();
 
 
             app.MapControllers();

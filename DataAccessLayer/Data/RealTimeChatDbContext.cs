@@ -11,7 +11,9 @@ namespace RealTimeChatApi.DataAccessLayer.Data
         {
         }
 
-        //public DbSet<User> Users { get; set; }
+        public DbSet<Message> Messages { get; set; }
+
+        public DbSet<Log> Logs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,6 +26,21 @@ namespace RealTimeChatApi.DataAccessLayer.Data
             modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("AspNetUserLogins").HasKey(ul => new { ul.LoginProvider, ul.ProviderKey });
             modelBuilder.Entity<IdentityUserToken<string>>().ToTable("AspNetUserTokens").HasKey(ut => new { ut.UserId, ut.LoginProvider, ut.Name });
 
+            //modelBuilder.Entity<IdentityUserLogin<string>>().HasNoKey();
+            //modelBuilder.Entity<IdentityUserRole<string>>().HasNoKey();
+
+
+            modelBuilder.Entity<Message>()
+             .HasOne(m => m.sender)
+             .WithMany(u => u.sentMessages)
+             .HasForeignKey(m => m.senderId)
+             .OnDelete(DeleteBehavior.ClientSetNull);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.receiver)
+                .WithMany(u => u.receivedMessages)
+                .HasForeignKey(m => m.receiverId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
 
 
         }

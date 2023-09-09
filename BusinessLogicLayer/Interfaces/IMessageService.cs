@@ -1,6 +1,16 @@
-﻿namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
+﻿using Microsoft.AspNetCore.Mvc;
+using RealTimeChatApi.BusinessLogicLayer.DTOs;
+
+namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
 {
-    public class IMessageService
+    public interface IMessageService
     {
+        Task<IActionResult> SendMessage(string receiverId, [FromBody] SendMessageRequestDto request);
+
+        Task<IActionResult> EditMessage(int messageId, [FromBody] EditMessageRequestDto request);
+
+        Task<IActionResult> DeleteMessage(int messageId);
+
+        Task<IActionResult> GetConversationHistory(string userId, DateTime before, int count = 20, string sort = "desc");
     }
 }

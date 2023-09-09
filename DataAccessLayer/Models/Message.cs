@@ -1,12 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RealTimeChatApi.DataAccessLayer.Models
 {
     public class Message
     {
+        [Key]
         public int messageId { get; set; }
-        public int senderId { get; set; }
-        public int receiverId { get; set; }
+        public string senderId { get; set; }
+        public string receiverId { get; set; }
         public string content { get; set; }
         public DateTime timestamp { get; set; }
 
