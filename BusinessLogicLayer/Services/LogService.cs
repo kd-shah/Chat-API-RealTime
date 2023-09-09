@@ -1,21 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Data;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 
 namespace RealTimeChatApi.BusinessLogicLayer.Services
 {
-    public class LogService
+    public class LogService : ILogService
     {
-        private readonly RealTimeChatDbContext _context;
         private readonly ILogRepository _logRepository;
-        public LogService(RealTimeChatDbContext context, ILogRepository logRepository)
+        public LogService(ILogRepository logRepository)
         {
             _logRepository = logRepository;
-            _context = context;
         }
 
-        public async Task<IActionResult> GetLogs([FromQuery] string timeframe, [FromQuery] string startTime = null, [FromQuery] string endTime = null)
+        public async Task<IActionResult> GetLogs([FromQuery] string timeframe , [FromQuery] string startTime , [FromQuery] string endTime)
         {
             DateTime? parsedStartTime = ParseDateTime(startTime);
             DateTime? parsedEndTime = ParseDateTime(endTime);
@@ -24,8 +23,11 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             if (parsedEndTime == null)
                 parsedEndTime = DateTime.Now;
 
-            Console.WriteLine($"parsedStartTime: {parsedStartTime}, parsedEndTime: {parsedEndTime}");
 
+            if (string.IsNullOrEmpty(timeframe))
+            {
+                timeframe = "5";
+            }
 
             switch (timeframe)
             {
@@ -41,19 +43,14 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 case "custom":
                     parsedStartTime = parsedStartTime ?? DateTime.Now.AddMinutes(-30);
                     parsedEndTime = parsedEndTime ?? DateTime.Now;
-
                     break;
                 default:
+                    parsedStartTime = DateTime.Now.AddMinutes(-5);
                     break;
-            }
+            }            
 
-            //var logs = await _context.Logs
-            //    .Where(log => log.timeStamp >= parsedStartTime && log.timeStamp <= parsedEndTime)
-            //    .ToListAsync();
-
-            var logs = await _logRepository.GetLogs();
-            if (logs.Count == 0)
-                return new NotFoundObjectResult("no log found");
+            var logs = await _logRepository.GetLogs(parsedStartTime, parsedEndTime);
+               
             return new OkObjectResult(logs);
         }
         private DateTime? ParseDateTime(string dateTimeString)

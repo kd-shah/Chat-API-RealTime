@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DataAccessLayer\DTOs\**" />
+    <Content Remove="DataAccessLayer\DTOs\**" />
+    <EmbeddedResource Remove="DataAccessLayer\DTOs\**" />
+    <None Remove="DataAccessLayer\DTOs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.10" />
@@ -20,10 +27,6 @@
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.9" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DataAccessLayer\DTOs\" />
   </ItemGroup>
 
 </Project>

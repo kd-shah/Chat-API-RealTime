@@ -4488,19 +4488,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\promact\\.nuget\\packages\\": {}
+    "C:\\Users\\kunal\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\promact\\Desktop\\Internship\\Chat Application RealTime\\Backend\\RealTimeChatApi\\RealTimeChatApi.csproj",
+      "projectUniqueName": "C:\\Users\\kunal\\OneDrive\\Desktop\\Internship\\Backend\\Chat-API-RealTime\\RealTimeChatApi.csproj",
       "projectName": "RealTimeChatApi",
-      "projectPath": "C:\\Users\\promact\\Desktop\\Internship\\Chat Application RealTime\\Backend\\RealTimeChatApi\\RealTimeChatApi.csproj",
-      "packagesPath": "C:\\Users\\promact\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\promact\\Desktop\\Internship\\Chat Application RealTime\\Backend\\RealTimeChatApi\\obj\\",
+      "projectPath": "C:\\Users\\kunal\\OneDrive\\Desktop\\Internship\\Backend\\Chat-API-RealTime\\RealTimeChatApi.csproj",
+      "packagesPath": "C:\\Users\\kunal\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\kunal\\OneDrive\\Desktop\\Internship\\Backend\\Chat-API-RealTime\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\promact\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\kunal\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4508,7 +4508,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\sdk\\7.0.304\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
+        "C:\\Program Files\\dotnet\\sdk\\7.0.306\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -4589,7 +4589,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
       }
     }
   }

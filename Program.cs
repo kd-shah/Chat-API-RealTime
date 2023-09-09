@@ -57,10 +57,15 @@ namespace RealTimeChatApi
 
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<IUserRepository, UserRepository>();
-            
-            
+           
+
+
+
             builder.Services.AddScoped<IMessageService, MessageService>();
             IServiceCollection serviceCollection = builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+
+            builder.Services.AddTransient<ILogService, LogService>();
+            builder.Services.AddTransient<ILogRepository, LogRepository>();
 
 
             builder.Services.AddAuthentication(x =>

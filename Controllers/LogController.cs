@@ -19,9 +19,9 @@ namespace RealTimeChatApi.Controllers
         }
 
         [HttpGet("log")]
-        public async Task<IActionResult> GetLogs([FromQuery] string timeframe, [FromQuery] string startTime = null, [FromQuery] string endTime = null)
+        public async Task<IActionResult> GetLogs([FromQuery] string timeframe = null, [FromQuery] string startTime = null, [FromQuery] string endTime = null)
         {
-            return await _logService.GetLogs(timeframe, startTime = null, endTime = null);
+            return await _logService.GetLogs(timeframe , startTime , endTime );
         }
     }
 }

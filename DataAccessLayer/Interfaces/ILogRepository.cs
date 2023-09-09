@@ -3,8 +3,8 @@ using RealTimeChatApi.DataAccessLayer.Models;
 
 namespace RealTimeChatApi.DataAccessLayer.Interfaces
 {
-    public class ILogRepository
+    public interface ILogRepository
     {
-        Task<IActionResult> GetLogs();
+        Task<IQueryable<Log>> GetLogs(DateTime? parsedStartTime, DateTime? parsedEndTime);
     }
 }

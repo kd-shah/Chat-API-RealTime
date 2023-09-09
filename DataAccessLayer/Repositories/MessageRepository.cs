@@ -86,8 +86,8 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             var conversation = _context.Messages.Include(m => m.sender)
                 .Include(m => m.receiver)
                 .Where(m => (m.senderId == authenticatedUser.Id && m.receiverId == id) ||
-                            (m.senderId == id && m.receiverId == authenticatedUser.Id))
-                ;
+                            (m.senderId == id && m.receiverId == authenticatedUser.Id));
+                
 
             return conversation;
         }
