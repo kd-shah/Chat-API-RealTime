@@ -5,7 +5,7 @@ using RealTimeChatApi.DataAccessLayer.Data;
 
 namespace RealTimeChatApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/log")]
     [ApiController]
     public class LogController : ControllerBase
     {
@@ -18,10 +18,10 @@ namespace RealTimeChatApi.Controllers
             _context = context;
         }
 
-        [HttpGet("log")]
-        public async Task<IActionResult> GetLogs([FromQuery] string timeframe, [FromQuery] string startTime = null, [FromQuery] string endTime = null)
+        [HttpGet]
+        public async Task<IActionResult> GetLogs([FromQuery] string timeframe = null, [FromQuery] string startTime = null, [FromQuery] string endTime = null)
         {
-            return await _logService.GetLogs(timeframe, startTime = null, endTime = null);
+            return await _logService.GetLogs(timeframe, startTime, endTime);
         }
     }
 }

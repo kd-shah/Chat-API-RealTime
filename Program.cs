@@ -13,6 +13,7 @@ using System.Text;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Repositories;
 using RealTimeChatApi.Middleware;
+using Microsoft.AspNetCore.Authentication.Google;
 
 namespace RealTimeChatApi
 {
@@ -24,8 +25,14 @@ namespace RealTimeChatApi
 
             // Add services to the container.
 
+            // Add configuration from appsettings.json and other sources
+            builder.Configuration.AddJsonFile("appsettings.json");
+            builder.Configuration.AddEnvironmentVariables();
+
+
+
             builder.Services.AddControllers();
-            
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
@@ -57,10 +64,15 @@ namespace RealTimeChatApi
 
             builder.Services.AddTransient<IUserService, UserService>();
             builder.Services.AddTransient<IUserRepository, UserRepository>();
-            
-            
+
+
+
+
             builder.Services.AddScoped<IMessageService, MessageService>();
             IServiceCollection serviceCollection = builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+
+            builder.Services.AddTransient<ILogService, LogService>();
+            builder.Services.AddTransient<ILogRepository, LogRepository>();
 
 
             builder.Services.AddAuthentication(x =>
@@ -80,6 +92,18 @@ namespace RealTimeChatApi
                 };
             }
             );
+
+
+            // Access configuration values
+            var googleClientId = builder.Configuration["Google:ClientId"];
+            var googleClientSecret = builder.Configuration["Google:ClientSecret"];
+            builder.Services.AddAuthentication()
+               .AddGoogle(googleoptions =>
+               {
+                   googleoptions.ClientId = googleClientId;
+                   googleoptions.ClientSecret = googleClientSecret;
+                   googleoptions.CallbackPath = "/auth/google-callback";
+               });
 
 
             var app = builder.Build();

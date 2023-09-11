@@ -6,6 +6,7 @@ using System.Linq;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Models;
 using System.Security.Claims;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace RealTimeChatApi.BusinessLogicLayer.Services
 {
@@ -177,6 +178,39 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             return new OkObjectResult(chat);
 
 
+        }
+        
+        public async Task<IActionResult> SearchConversations(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return new BadRequestObjectResult("Invalid keyword");
+            }
+
+            var user = await _messageRepository.GetSender();
+
+            if (string.IsNullOrEmpty(user.Id))
+            {
+                return new UnauthorizedObjectResult("Unauthorized");
+            }
+
+            var matchingMessages = await _messageRepository.SearchMessages(user.Id, query);
+
+            if (matchingMessages == null || !matchingMessages.Any())
+            {
+                return new OkObjectResult(new List<object>()); 
+            }
+
+            var response = matchingMessages.Select(message => new
+            {
+                id = message.messageId,
+                senderId = message.sender.Id,
+                receiverId = message.receiver.Id,
+                content = message.content,
+                timestamp = message.timestamp
+            });
+
+            return new OkObjectResult(response);
         }
     }
 

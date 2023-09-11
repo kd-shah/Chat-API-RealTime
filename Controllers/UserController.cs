@@ -4,6 +4,7 @@ using RealTimeChatApi.DataAccessLayer.Models;
 using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
 
 namespace RealTimeChatApi.Controllers
 {
@@ -20,11 +21,10 @@ namespace RealTimeChatApi.Controllers
             _userService = userService;
         }
 
-
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUserAsync([FromBody] RegisterRequestDto UserObj)
         {
-          
+
             return await _userService.RegisterUserAsync(UserObj);
 
         }

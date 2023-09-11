@@ -88,3 +88,4 @@ C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeCh
 C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\obj\Debug\net7.0\RealTimeChatApi.pdb
 C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\obj\Debug\net7.0\RealTimeChatApi.genruntimeconfig.cache
 C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\obj\Debug\net7.0\ref\RealTimeChatApi.dll
+C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.Google.dll

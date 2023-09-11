@@ -39,5 +39,11 @@ namespace RealTimeChatApi.Controllers
         { 
             return await _messageService.GetConversationHistory(userId, before, count = 20, sort = "desc");
         }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchConversations(string query)
+        {
+            return await _messageService.SearchConversations(query);
+        }
     }
 }

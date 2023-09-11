@@ -19,6 +19,7 @@ namespace RealTimeChatApi.DataAccessLayer.Interfaces
 
         Task<IQueryable<Message>> GetConversationHistory(string id, AppUser authenticateduser);
 
+        Task<IQueryable<Message>> SearchMessages(string userId, string query);
 
     }
 }

@@ -86,10 +86,19 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             var conversation = _context.Messages.Include(m => m.sender)
                 .Include(m => m.receiver)
                 .Where(m => (m.senderId == authenticatedUser.Id && m.receiverId == id) ||
-                            (m.senderId == id && m.receiverId == authenticatedUser.Id))
-                ;
+                            (m.senderId == id && m.receiverId == authenticatedUser.Id));
 
             return conversation;
+        }
+        
+        public async Task<IQueryable<Message>> SearchMessages(string userId , string query)
+        {
+            var messages = _context.Messages
+        .Where(message =>
+            (message.senderId == userId || message.receiverId == userId) && 
+            message.content.Contains(query));
+
+            return messages;
         }
     }
 }
