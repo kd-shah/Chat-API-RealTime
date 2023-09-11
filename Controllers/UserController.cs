@@ -32,7 +32,7 @@ namespace RealTimeChatApi.Controllers
         [Authorize(AuthenticationSchemes = "Google")]
         public async Task<IActionResult> GoogleResponse()
         {
-            
+            return await _userService.GoogleResponse();
         }
 
         [HttpPost("register")]

@@ -29,10 +29,10 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             return await _userManager.CreateAsync(newUser, UserObj.password);
          }
 
-        public async Task<bool> CheckExistingEmail(string email)
+        public async Task<AppUser> CheckExistingEmail(string email)
         {
             var userExists = await _userManager.FindByEmailAsync(email);
-            return userExists != null;
+            return userExists;
         }
 
 
@@ -57,7 +57,6 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
         }
 
 
-       
 
         public async Task<AppUser> GetCurrentUser()
         {
@@ -74,5 +73,10 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             return null;
         }
 
+
+        public async Task<IdentityResult> RegisterUserGoogle(AppUser newUser, string password)
+        {
+            return await _userManager.CreateAsync(newUser, password);
+        }
     }
 }

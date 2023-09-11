@@ -37,6 +37,8 @@ namespace RealTimeChatApi
             builder.Services.AddControllers();
 
             builder.Services.AddSignalR();
+            builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
 
 
             builder.Services.AddEndpointsApiExplorer();
