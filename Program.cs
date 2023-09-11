@@ -14,6 +14,7 @@ using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Repositories;
 using RealTimeChatApi.Middleware;
 using Microsoft.AspNetCore.Authentication.Google;
+using RealTimeChatApi.Hubs;
 
 namespace RealTimeChatApi
 {
@@ -22,6 +23,8 @@ namespace RealTimeChatApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddSignalR();
 
             // Add services to the container.
 
@@ -32,6 +35,9 @@ namespace RealTimeChatApi
 
 
             builder.Services.AddControllers();
+
+            builder.Services.AddSignalR();
+
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -66,7 +72,15 @@ namespace RealTimeChatApi
             builder.Services.AddTransient<IUserRepository, UserRepository>();
 
 
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
 
             builder.Services.AddScoped<IMessageService, MessageService>();
             IServiceCollection serviceCollection = builder.Services.AddScoped<IMessageRepository, MessageRepository>();
@@ -75,11 +89,17 @@ namespace RealTimeChatApi
             builder.Services.AddTransient<ILogRepository, LogRepository>();
 
 
+            // Access configuration values
+            var googleClientId = builder.Configuration["Google:ClientId"];
+            var googleClientSecret = builder.Configuration["Google:ClientSecret"];
+
+
             builder.Services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
+            })
+                .AddJwtBearer(x =>
             {
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
@@ -91,22 +111,25 @@ namespace RealTimeChatApi
                     ValidateIssuer = false,
                 };
             }
-            );
+            )
+             .AddGoogle(googleoptions =>
+              {
+                  googleoptions.ClientId = googleClientId;
+                  googleoptions.ClientSecret = googleClientSecret;
+                  googleoptions.CallbackPath = "/signin-google";
+              });
 
 
-            // Access configuration values
-            var googleClientId = builder.Configuration["Google:ClientId"];
-            var googleClientSecret = builder.Configuration["Google:ClientSecret"];
-            builder.Services.AddAuthentication()
-               .AddGoogle(googleoptions =>
-               {
-                   googleoptions.ClientId = googleClientId;
-                   googleoptions.ClientSecret = googleClientSecret;
-                   googleoptions.CallbackPath = "/auth/google-callback";
-               });
+
+
+
+
 
 
             var app = builder.Build();
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -125,6 +148,17 @@ namespace RealTimeChatApi
 
 
             app.MapControllers();
+
+            app.UseCors("AllowAll");
+
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    // Your existing endpoints here
+
+            //    endpoints.MapHub<ChatHub>("/chat-hub"); // Add this line
+            //});
+
+            app.MapHub<ChatHub>("chat-hub");
 
             app.Run();
         }

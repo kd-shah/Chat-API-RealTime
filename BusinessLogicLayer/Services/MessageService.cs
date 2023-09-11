@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using RealTimeChatApi.BusinessLogicLayer.Interfaces;
-using System.Linq;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Models;
-using System.Security.Claims;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using RealTimeChatApi.Hubs;
 
 namespace RealTimeChatApi.BusinessLogicLayer.Services
 {
@@ -14,10 +13,12 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
     {
         
         public readonly IMessageRepository _messageRepository;
-        public MessageService( IMessageRepository messageRepository)
+        private readonly IHubContext<ChatHub> _hubContext;
+        public MessageService( IMessageRepository messageRepository, IHubContext<ChatHub> hubContext)
         {
             
             _messageRepository = messageRepository;
+            _hubContext = hubContext;
         }
 
         public async Task<IActionResult> SendMessage(string receiverId, [FromBody] SendMessageRequestDto request)
@@ -55,6 +56,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             };
 
             await _messageRepository.SendMessage(message);
+            //await _hubContext.Clients.User(receiverId).SendAsync("ReceiveMessage", request.content);
 
             var response = new 
             {
@@ -155,7 +157,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             {
                 return new BadRequestObjectResult("Invalid Request Parameter : Chat Count cannot be zero or negative");
             }
-            //conversation = sort == "desc" ? conversation.OrderByDescending(m => m.timestamp) : conversation.OrderBy(m => m.timestamp);
+            
             conversation = sort == "asc" ? conversation.OrderBy(m => m.timestamp) : conversation.OrderByDescending(m => m.timestamp);
 
             var chat = await conversation.Select(m => new

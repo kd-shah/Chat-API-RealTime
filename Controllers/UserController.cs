@@ -5,6 +5,7 @@ using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 namespace RealTimeChatApi.Controllers
 {
@@ -19,6 +20,19 @@ namespace RealTimeChatApi.Controllers
         public UserController(IUserService userService)
         {
             _userService = userService;
+        }
+
+        [HttpGet("google-login")]
+        public async Task <IActionResult> GoogleLogin()
+        {
+            return await _userService.GoogleLogin();
+        }
+
+        [HttpGet("google-response")]
+        [Authorize(AuthenticationSchemes = "Google")]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            
         }
 
         [HttpPost("register")]

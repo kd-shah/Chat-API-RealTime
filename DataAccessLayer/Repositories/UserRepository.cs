@@ -29,9 +29,9 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             return await _userManager.CreateAsync(newUser, UserObj.password);
          }
 
-        public async Task<bool> CheckExistingEmail(RegisterRequestDto UserObj)
+        public async Task<bool> CheckExistingEmail(string email)
         {
-            var userExists = await _userManager.FindByEmailAsync(UserObj.email);
+            var userExists = await _userManager.FindByEmailAsync(email);
             return userExists != null;
         }
 

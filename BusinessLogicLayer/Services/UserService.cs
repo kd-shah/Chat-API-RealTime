@@ -12,6 +12,8 @@ using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using Microsoft.AspNetCore.Identity;
 using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using System;
 
 namespace RealTimeChatApi.BusinessLogicLayer.Services
 {
@@ -27,6 +29,63 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             _userRepository = userRepository;
         }
 
+        public async Task<IActionResult> GoogleLogin()
+        {
+            var properties = new AuthenticationProperties
+            {
+                RedirectUri = Url.Action("GoogleResponse"),
+            };
+
+            return Challenge(properties, "Google");
+        }
+
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var authenticateResult = await HttpContext.AuthenticateAsync("Google");
+
+            if (!authenticateResult.Succeeded)
+            {
+                return new UnauthorizedObjectResult("Unauthorized");
+            }
+
+            // Access user information from authenticateResult.Principal
+            var userId = authenticateResult.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userEmail = authenticateResult.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            var userPassword = authenticateResult.Principal.FindFirst(ClaimTypes.assword)?.Value;
+
+            // Check if the user already exists in your database
+            var existingUser = await _userRepository.CheckExistingEmail(userEmail);
+
+            if (existingUser == null)
+            {
+                // If the user doesn't exist, create a new user in your database
+                var newUser = new RegisterRequestDto
+                {
+                    email = userEmail,
+                    // Set other user properties as needed
+                };
+
+                var registrationResult = await _userRepository.RegisterUserAsync(newUser);
+
+                if (registrationResult is OkObjectResult registrationOkResult)
+                {
+                    // Registration successful, you can log in the user here if needed
+                    return new OkObjectResult(new { Message = "Google login and registration successful", newUser = registrationOkResult.Value });
+                }
+                else
+                {
+                    // Handle registration failure
+                    return registrationResult;
+                }
+            }
+            else
+            {
+                // User already exists, you can log in the user here if needed
+                return new OkObjectResult(new { Message = "Google login successful", UserId = existingUser.Id });
+            }
+        }
+
+        
         public async Task<IActionResult> RegisterUserAsync([FromBody] RegisterRequestDto UserObj)
         {
 
@@ -40,7 +99,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 return new BadRequestObjectResult(new { Message = "Invalid password format" });
 
             // Check if the user already exists
-            var existingUser = await _userRepository.CheckExistingEmail(UserObj);
+            var existingUser = await _userRepository.CheckExistingEmail(UserObj.email);
             
             //var existingUser = await _userManager.FindByEmailAsync(UserObj.email);
             if (existingUser)
@@ -178,6 +237,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
 
             return true;
         }
+
 
     }
 }

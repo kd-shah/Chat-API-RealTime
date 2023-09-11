@@ -9,7 +9,7 @@ namespace RealTimeChatApi.DataAccessLayer.Interfaces
     {
         Task<IdentityResult> RegisterUserAsync(AppUser newUser, RegisterRequestDto UserObj);
 
-        Task<bool> CheckExistingEmail(RegisterRequestDto UserObj);
+        Task<bool> CheckExistingEmail(string email);
 
         Task<SignInResult> Authenticate(AppUser newUser, LoginRequestDto UserObj);
 
