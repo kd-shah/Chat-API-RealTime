@@ -37,7 +37,7 @@ namespace RealTimeChatApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetConversationHistory(string userId, DateTime before, int count = 20, string sort = "desc") 
         { 
-            return await _messageService.GetConversationHistory(userId, before, count = 20, sort = "desc");
+            return await _messageService.GetConversationHistory(userId, before, count, sort);
         }
 
         [HttpGet("search")]

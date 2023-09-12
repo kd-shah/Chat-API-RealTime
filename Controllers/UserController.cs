@@ -22,17 +22,23 @@ namespace RealTimeChatApi.Controllers
             _userService = userService;
         }
 
-        [HttpGet("google-login")]
-        public async Task <IActionResult> GoogleLogin()
-        {
-            return await _userService.GoogleLogin();
-        }
+        //[HttpGet("google-login")]
+        //public async Task <IActionResult> GoogleLogin()
+        //{
+        //    return await _userService.GoogleLogin();
+        //}
 
-        [HttpGet("google-response")]
-        [Authorize(AuthenticationSchemes = "Google")]
-        public async Task<IActionResult> GoogleResponse()
+        //[HttpGet("google-response")]
+        //[Authorize(AuthenticationSchemes = "Google")]
+        //public async Task<IActionResult> GoogleResponse()
+        //{
+        //    return await _userService.GoogleResponse();
+        //}
+
+        [HttpPost("GoogleAuthenticate")]
+        public async Task<string> GoogleAuthenticate([FromBody] ExternalAuthRequestDto request)
         {
-            return await _userService.GoogleResponse();
+            return await _userService.AuthenticateGoogle(request);
         }
 
         [HttpPost("register")]

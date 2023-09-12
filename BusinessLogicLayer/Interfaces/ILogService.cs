@@ -7,7 +7,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
 {
     public interface ILogService
     {
-        Task<IActionResult> GetLogs([FromQuery] string timeframe, [FromQuery] string startTime = null, [FromQuery] string endTime = null);
+        Task<IActionResult> GetLogs([FromQuery] string timeframe, [FromQuery] string startTime, [FromQuery] string endTime);
         
     }
 }

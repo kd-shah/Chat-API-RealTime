@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
-using Microsoft.IdentityModel.Tokens;
-using RealTimeChatApi.DataAccessLayer.Data;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
@@ -12,11 +9,8 @@ using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using Microsoft.AspNetCore.Identity;
 using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication.Cookies; 
-using Microsoft.AspNetCore.Authentication.Google; 
+using static Google.Apis.Auth.GoogleJsonWebSignature;
+
 
 namespace RealTimeChatApi.BusinessLogicLayer.Services
 {
@@ -25,87 +19,85 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
        
         
         private readonly IUserRepository _userRepository;
-        private readonly IUrlHelper _urlHelper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        public UserService( IUserRepository userRepository, IUrlHelper urlHelper, IHttpContextAccessor httpContextAccessor)
+        private readonly IConfiguration _configuration;
+        private readonly UserManager<AppUser> _userManager;
+        
+        public UserService( IUserRepository userRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
-            _httpContextAccessor = httpContextAccessor;
-           _urlHelper = urlHelper;
+           
+            _configuration = configuration;
             _userRepository = userRepository;
         }
 
-        public async Task<IActionResult> GoogleLogin()
+        
+        public async Task<string> AuthenticateGoogle([FromBody] ExternalAuthRequestDto request)
         {
-            //var properties = new AuthenticationProperties
-            //{
-            //    RedirectUri = _urlHelper.Action("GoogleResponse"),
-            //};
-
-            //return Challenge(properties, "Google");
-
-            var redirectUrl = _urlHelper.Action("GoogleResponse");
-            var googleAuthUrl = $"https://accounts.google.com/o/oauth2/auth?client_id=YOUR_CLIENT_ID&redirect_uri={redirectUrl}&response_type=code&scope=openid%20profile%20email";
-
-            return Redirect(googleAuthUrl);
+            //if (!ModelState.IsValid)
+            //    return new BadRequestObjectResult(ModelState.Values.SelectMany(it => it.Errors).Select(it => it.ErrorMessage));
+            var token = CreateJwt(await AuthenticateGoogleUserAsync(request));
+            return token;
         }
 
-        public async Task<IActionResult> GoogleResponse()
+        public async Task<AppUser> AuthenticateGoogleUserAsync(ExternalAuthRequestDto request)
         {
-            try
+            Payload payload = await ValidateAsync(request.IdToken, new ValidationSettings
             {
-                var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync("Google");
+                Audience = new[] { _configuration["Authentication:Google:ClientId"] }
+            });
 
-                if (!authenticateResult.Succeeded)
-                {
-                    return new UnauthorizedObjectResult("Unauthorized");
-                }
-
-                var userEmail = authenticateResult.Principal.FindFirst(ClaimTypes.Email)?.Value;
-                var userName = authenticateResult.Principal.FindFirst(ClaimTypes.Name)?.Value;
-
-                // Check if the user already exists in your database
-                var existingUser = await _userRepository.CheckExistingEmail(userEmail);
-
-                
-
-                if (existingUser == null)
-                {
-                    // If the user doesn't exist, create a new user in your database
-                    var newUser = new AppUser
-                    {
-                        Name = userName,
-                        UserName = userEmail,
-                        Email = userEmail,
-
-                        // Set other user properties as needed
-                    };
-
-                    var password = "";
-                    var registrationResult = await _userRepository.RegisterUserGoogle(newUser , password);
-
-                    if (registrationResult.Succeeded)
-                    {
-                        // Registration successful, you can log in the user here if needed
-                        return new OkObjectResult(new { Message = "Google login and registration successful" });
-                    }
-                    else
-                    {
-                        // Handle registration failure
-                        var errors = registrationResult.Errors.Select(e => e.Description).ToList();
-                        return new BadRequestObjectResult(new { Message = "Registration failed", Errors = errors });
-                    }
-                }
-                else
-                {
-                    // User already exists, you can log in the user here if needed
-                    return new OkObjectResult(new { Message = "Google login successful", UserId = existingUser.Id });
-                }
-            }
-            catch (Exception ex)
-            {
-                return new BadRequestObjectResult(new { Message = "An error occurred", Error = ex.Message });
-            }
+            return (AppUser)await GetOrCreateExternalLoginUser(ExternalAuthRequestDto.PROVIDER, payload.Subject, payload.Email, payload.GivenName, payload.FamilyName);
         }
+
+
+        private async Task<IdentityUser> GetOrCreateExternalLoginUser(string provider, string key, string email, string firstName, string lastName)
+        {
+            var user = await _userManager.FindByLoginAsync(provider, key);
+
+
+            if (user != null)
+                return user;
+
+            user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                // If the email is not found, try to create the user with the provided firstName as the username
+                user = new AppUser
+                {
+                    Email = email,
+                    UserName = firstName,
+                    Id = key,
+                };
+
+            }
+            var userName = await _userManager.FindByNameAsync(firstName);
+            if (userName != null)
+            {
+                // If the email exists and the username (firstName) is also taken, generate a unique username
+                string newUserName = firstName;
+                int count = 1;
+                while (userName != null)
+                {
+                    newUserName = $"{firstName}{count:D2}"; // Appending a unique number to the username
+                    userName = await _userManager.FindByNameAsync(newUserName);
+                    count++;
+                }
+                user.UserName = newUserName;
+                await _userManager.UpdateAsync(user);
+            }
+            await _userManager.CreateAsync(user);
+            var info = new UserLoginInfo(provider, key, provider.ToUpperInvariant());
+            var result = await _userManager.AddLoginAsync(user, info);
+
+            if (result.Succeeded)
+                return user;
+
+            return null;
+        }
+
+        // 
+
+
 
 
 
@@ -125,7 +117,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             var existingUser = await _userRepository.CheckExistingEmail(UserObj.email);
 
             //var existingUser = await _userManager.FindByEmailAsync(UserObj.email);
-            if (existingUser == null)
+            if (existingUser != null)
                 return new ConflictObjectResult(new { message = "Registration failed because the email is already registered" });
 
 

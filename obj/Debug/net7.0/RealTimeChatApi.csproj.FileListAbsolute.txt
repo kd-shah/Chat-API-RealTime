@@ -96,3 +96,15 @@ C:\Users\kunal\OneDrive\Desktop\Internship\Backend\Chat-API-RealTime\obj\Debug\n
 C:\Users\kunal\OneDrive\Desktop\Internship\Backend\Chat-API-RealTime\obj\Debug\net7.0\RealTimeChatApi.csproj.CoreCompileInputs.cache
 C:\Users\kunal\OneDrive\Desktop\Internship\Backend\Chat-API-RealTime\obj\Debug\net7.0\RealTimeChatApi.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\kunal\OneDrive\Desktop\Internship\Backend\Chat-API-RealTime\obj\Debug\net7.0\RealTimeChatApi.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\bin\Debug\net7.0\Google.Apis.dll
+C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\bin\Debug\net7.0\Google.Apis.Auth.PlatformServices.dll
+C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\bin\Debug\net7.0\Google.Apis.Auth.dll
+C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\bin\Debug\net7.0\Google.Apis.Core.dll
+C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\bin\Debug\net7.0\Newtonsoft.Json.dll
+C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\bin\Debug\net7.0\System.Web.Mvc.dll
+C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\bin\Debug\net7.0\System.Web.Razor.dll
+C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\bin\Debug\net7.0\System.Web.Helpers.dll
+C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\bin\Debug\net7.0\System.Web.WebPages.Deployment.dll
+C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\bin\Debug\net7.0\System.Web.WebPages.Razor.dll
+C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\bin\Debug\net7.0\System.Web.WebPages.dll
+C:\Users\promact\Desktop\Internship\Chat Application RealTime\Backend\RealTimeChatApi\bin\Debug\net7.0\Microsoft.Web.Infrastructure.dll

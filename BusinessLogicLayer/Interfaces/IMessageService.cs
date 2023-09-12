@@ -11,7 +11,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
 
         Task<IActionResult> DeleteMessage(int messageId);
 
-        Task<IActionResult> GetConversationHistory(string userId, DateTime before, int count = 20, string sort = "desc");
+        Task<IActionResult> GetConversationHistory(string userId, DateTime before, int count, string sort);
 
         Task<IActionResult> SearchConversations(string query);
     }

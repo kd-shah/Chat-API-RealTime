@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\kunal\\OneDrive\\Desktop\\Internship\\Backend\\Chat-API-RealTime\\RealTimeChatApi.csproj": {}
+    "C:\\Users\\promact\\Desktop\\Internship\\Chat Application RealTime\\Backend\\RealTimeChatApi\\RealTimeChatApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\kunal\\OneDrive\\Desktop\\Internship\\Backend\\Chat-API-RealTime\\RealTimeChatApi.csproj": {
+    "C:\\Users\\promact\\Desktop\\Internship\\Chat Application RealTime\\Backend\\RealTimeChatApi\\RealTimeChatApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\kunal\\OneDrive\\Desktop\\Internship\\Backend\\Chat-API-RealTime\\RealTimeChatApi.csproj",
+        "projectUniqueName": "C:\\Users\\promact\\Desktop\\Internship\\Chat Application RealTime\\Backend\\RealTimeChatApi\\RealTimeChatApi.csproj",
         "projectName": "RealTimeChatApi",
-        "projectPath": "C:\\Users\\kunal\\OneDrive\\Desktop\\Internship\\Backend\\Chat-API-RealTime\\RealTimeChatApi.csproj",
-        "packagesPath": "C:\\Users\\kunal\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\kunal\\OneDrive\\Desktop\\Internship\\Backend\\Chat-API-RealTime\\obj\\",
+        "projectPath": "C:\\Users\\promact\\Desktop\\Internship\\Chat Application RealTime\\Backend\\RealTimeChatApi\\RealTimeChatApi.csproj",
+        "packagesPath": "C:\\Users\\promact\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\promact\\Desktop\\Internship\\Chat Application RealTime\\Backend\\RealTimeChatApi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\kunal\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\promact\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,7 +22,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\sdk\\7.0.306\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
+          "C:\\Program Files\\dotnet\\sdk\\7.0.304\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -41,6 +41,14 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
+            "Google.Apis.Auth": {
+              "target": "Package",
+              "version": "[1.62.0, )"
+            },
+            "Microsoft.AspNet.Mvc": {
+              "target": "Package",
+              "version": "[5.2.9, )"
+            },
             "Microsoft.AspNetCore.Authentication.Google": {
               "target": "Package",
               "version": "[7.0.10, )"
@@ -79,6 +87,10 @@
               "target": "Package",
               "version": "[7.0.10, )"
             },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
+            },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
               "version": "[6.5.0, )"
@@ -107,7 +119,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.304\\RuntimeIdentifierGraph.json"
         }
       }
     }

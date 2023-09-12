@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using RealTimeChatApi.BusinessLogicLayer.Services;
+using RealTimeChatApi.DataAccessLayer.Models;
 
 namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
 {
@@ -12,8 +14,12 @@ namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
 
         Task<IActionResult> GetAllUsers();
 
-        Task<IActionResult> GoogleLogin();
+        //Task<IActionResult> GoogleLogin();
 
-        Task<IActionResult> GoogleResponse();
+        //Task<IActionResult> GoogleResponse();
+
+        Task<string> AuthenticateGoogle(ExternalAuthRequestDto request);
+
+        Task<AppUser> AuthenticateGoogleUserAsync(ExternalAuthRequestDto request);
     }
 }

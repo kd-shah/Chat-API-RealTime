@@ -15,6 +15,9 @@ using RealTimeChatApi.DataAccessLayer.Repositories;
 using RealTimeChatApi.Middleware;
 using Microsoft.AspNetCore.Authentication.Google;
 using RealTimeChatApi.Hubs;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Mvc;
 
 namespace RealTimeChatApi
 {
@@ -37,7 +40,19 @@ namespace RealTimeChatApi
             builder.Services.AddControllers();
 
             builder.Services.AddSignalR();
-            builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+           
+            builder.Services.AddHttpContextAccessor(); // Add HttpContextAccessor
+
+            // Register IActionContextAccessor
+            builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+            // Add HttpContextAccessor
+            builder.Services.AddSingleton<IUrlHelper>(x =>
+            {
+                var actionContext = x.GetRequiredService<IActionContextAccessor>().ActionContext;
+                return new UrlHelper(actionContext);
+            });
+
 
 
 

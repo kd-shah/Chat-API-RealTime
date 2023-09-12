@@ -122,7 +122,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             return new OkObjectResult(new { message = "Message Deleted successfully" });
         }
 
-        public async Task<IActionResult> GetConversationHistory(string userId, DateTime before, int count = 20, string sort = "desc")
+        public async Task<IActionResult> GetConversationHistory(string userId, DateTime before, int count , string sort)
         {
 
             var authenticatedUser = await _messageRepository.GetSender();
