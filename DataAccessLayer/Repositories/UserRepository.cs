@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using RealTimeChatApi.DataAccessLayer.Data;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
@@ -57,7 +58,6 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
         }
 
 
-
         public async Task<AppUser> GetCurrentUser()
         {
             var currentUserId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -74,9 +74,19 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
         }
 
 
-        public async Task<IdentityResult> RegisterUserGoogle(AppUser newUser, string password)
+        public async Task<AppUser> FindByLoginAsync(string provider, string key)
         {
-            return await _userManager.CreateAsync(newUser, password);
+            return await _userManager.FindByLoginAsync(provider, key);
+        }
+
+        public async Task<IdentityResult> RegisterGoogleUser(AppUser user)
+        {
+            return await _userManager.CreateAsync(user);
+        }
+
+        public async Task<IdentityResult> AuthenticateGoogleUser(AppUser user , UserLoginInfo info)
+        {
+            return await _userManager.AddLoginAsync(user, info);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using RealTimeChatApi.DataAccessLayer.Models;
 using System.Security.Claims;
@@ -19,7 +20,10 @@ namespace RealTimeChatApi.DataAccessLayer.Interfaces
         
         Task<AppUser> GetCurrentUser();
 
-        Task<IdentityResult> RegisterUserGoogle(AppUser newUser, string password);
+        Task<AppUser> FindByLoginAsync(string provider, string key);
 
+        Task<IdentityResult> RegisterGoogleUser(AppUser user);
+
+        Task<IdentityResult> AuthenticateGoogleUser(AppUser user, UserLoginInfo info);
     }
 }

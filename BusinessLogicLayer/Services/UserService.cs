@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using static Google.Apis.Auth.GoogleJsonWebSignature;
-
+using Google.Apis.Auth;
 
 namespace RealTimeChatApi.BusinessLogicLayer.Services
 {
@@ -32,68 +32,73 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
         
         public async Task<string> AuthenticateGoogle([FromBody] ExternalAuthRequestDto request)
         {
-            //if (!ModelState.IsValid)
-            //    return new BadRequestObjectResult(ModelState.Values.SelectMany(it => it.Errors).Select(it => it.ErrorMessage));
-            var token = CreateJwt(await AuthenticateGoogleUserAsync(request));
+            var token = CreateToken(await AuthenticateGoogleUserAsync(request));
             return token;
         }
 
-        public async Task<AppUser> AuthenticateGoogleUserAsync(ExternalAuthRequestDto request)
+        public async Task<IdentityUser> AuthenticateGoogleUserAsync(ExternalAuthRequestDto request)
         {
-            Payload payload = await ValidateAsync(request.IdToken, new ValidationSettings
+            try
             {
-                Audience = new[] { _configuration["Authentication:Google:ClientId"] }
-            });
+                Payload payload = await GoogleJsonWebSignature.ValidateAsync(request.idToken, new ValidationSettings
+                {
+                    Audience = new[] { _configuration["Google:ClientId"] }
+                });
 
-            return (AppUser)await GetOrCreateExternalLoginUser(ExternalAuthRequestDto.PROVIDER, payload.Subject, payload.Email, payload.GivenName, payload.FamilyName);
+                return await GetOrCreateExternalLoginUser(ExternalAuthRequestDto.PROVIDER, payload.Subject, payload.Email, payload.GivenName, payload.FamilyName);
+            }
+            catch (InvalidJwtException ex)
+            {
+                throw; 
+            }
         }
 
 
         private async Task<IdentityUser> GetOrCreateExternalLoginUser(string provider, string key, string email, string firstName, string lastName)
         {
-            var user = await _userManager.FindByLoginAsync(provider, key);
-
+            var user = await _userRepository.FindByLoginAsync(provider, key);
 
             if (user != null)
+            {
                 return user;
 
-            user = await _userManager.FindByEmailAsync(email);
+            }
+                
 
-            if (user == null)
+            var existingUser = await _userRepository.CheckExistingEmail(email);
+
+
+            if (existingUser == null)
             {
-                // If the email is not found, try to create the user with the provided firstName as the username
+                // If the email is not found, create a new user
                 user = new AppUser
                 {
                     Email = email,
-                    UserName = firstName,
+                    UserName = email,
                     Id = key,
+                    Token = "",
+                    Name = firstName, 
                 };
 
-            }
-            var userName = await _userManager.FindByNameAsync(firstName);
-            if (userName != null)
-            {
-                // If the email exists and the username (firstName) is also taken, generate a unique username
-                string newUserName = firstName;
-                int count = 1;
-                while (userName != null)
-                {
-                    newUserName = $"{firstName}{count:D2}"; // Appending a unique number to the username
-                    userName = await _userManager.FindByNameAsync(newUserName);
-                    count++;
-                }
-                user.UserName = newUserName;
-                await _userManager.UpdateAsync(user);
-            }
-            await _userManager.CreateAsync(user);
-            var info = new UserLoginInfo(provider, key, provider.ToUpperInvariant());
-            var result = await _userManager.AddLoginAsync(user, info);
+                var result = await _userRepository.RegisterGoogleUser(user);
 
-            if (result.Succeeded)
+                if (!result.Succeeded)
+                {
+                    return null;
+                }
+            }
+
+            // Add the external login information to the user
+            var info = new UserLoginInfo(provider, key, provider.ToUpperInvariant());
+            
+            var addLoginResult = await _userRepository.AuthenticateGoogleUser(user, info);
+
+            if (addLoginResult.Succeeded)
                 return user;
 
             return null;
         }
+
 
         // 
 
@@ -153,14 +158,12 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             if (!IsValidEmail(UserObj.email))
                 return new BadRequestObjectResult(new { Message = "Invalid email format" });
 
-            // Use UserManager to find the user by email
+           
             var user = await _userRepository.CheckEmail(UserObj);
-            //var user = await _userManager.FindByEmailAsync(UserObj.email);
+           
             if (user == null)
                 return new NotFoundObjectResult(new { Message = "Login failed due to incorrect credentials" });
 
-            // Use SignInManager to check the user's password
-            //var result = await _signInManager.CheckPasswordSignInAsync(user, UserObj.password, lockoutOnFailure: false);
             var result = await _userRepository.Authenticate(user, UserObj);
 
             if (result.Succeeded)
@@ -168,13 +171,13 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 // Authentication succeeded, you can generate a token or return additional user information here.
                 var response = new LoginResponseDto
                 {
+                    userId = user.Id,
                     name = user.Name,
                     email = user.Email,
                     token = CreateJwt(user)
                 };
 
                 // Generate a token or perform any other post-authentication logic
-
                 return new OkObjectResult(new
                 {
                     Message = "Login Success",
@@ -216,6 +219,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("It Is A Secret Key Which Should Not Be Shared With Other Users.....");
+            //var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
 
             var claims = new List<Claim>
     {
@@ -251,6 +255,31 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 return false;
 
             return true;
+        }
+
+        private string CreateToken(IdentityUser user)
+        {
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                 //new Claim("UserId", user.UserID.ToString())
+                //new Claim(ClaimTypes.Role,"User")
+            };
+
+            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
+
+            var token = new JwtSecurityToken
+                (
+                    claims: claims,
+                    expires: DateTime.Now.AddDays(1),
+                    signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+                );
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return jwt;
+
         }
 
 

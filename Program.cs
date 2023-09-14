@@ -91,11 +91,12 @@ namespace RealTimeChatApi
 
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", builder =>
+                options.AddPolicy("SwaggerPolicy", builder =>
                 {
-                    builder.AllowAnyOrigin()
+                    builder.WithOrigins("http://localhost:4200")
+                           .AllowAnyHeader()
                            .AllowAnyMethod()
-                           .AllowAnyHeader();
+                           .AllowCredentials();
                 });
             });
 
@@ -133,7 +134,7 @@ namespace RealTimeChatApi
               {
                   googleoptions.ClientId = googleClientId;
                   googleoptions.ClientSecret = googleClientSecret;
-                  googleoptions.CallbackPath = "/signin-google";
+                  //googleoptions.CallbackPath = "/signin-google";
               });
 
 
@@ -166,7 +167,8 @@ namespace RealTimeChatApi
 
             app.MapControllers();
 
-            app.UseCors("AllowAll");
+            //app.UseCors("AllowAll");
+            app.UseCors("SwaggerPolicy");
 
             //app.UseEndpoints(endpoints =>
             //{

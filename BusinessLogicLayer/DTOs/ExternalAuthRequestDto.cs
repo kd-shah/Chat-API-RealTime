@@ -9,6 +9,9 @@ namespace RealTimeChatApi.BusinessLogicLayer.DTOs
 
         [JsonProperty("idToken")]
         [Required]
-        public string IdToken { get; set; }
+        public string idToken { get; set; }
+
+        //public string? Provider { get; set; }
+        //public string? IdToken { get; set; }
     }
 }

@@ -20,6 +20,6 @@ namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
 
         Task<string> AuthenticateGoogle(ExternalAuthRequestDto request);
 
-        Task<AppUser> AuthenticateGoogleUserAsync(ExternalAuthRequestDto request);
+        //Task<> AuthenticateGoogleUserAsync(ExternalAuthRequestDto request);
     }
 }
