@@ -20,7 +20,6 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
         
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
-        private readonly UserManager<AppUser> _userManager;
         
         public UserService( IUserRepository userRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
@@ -30,13 +29,26 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
         }
 
         
-        public async Task<string> AuthenticateGoogle([FromBody] ExternalAuthRequestDto request)
+        public async Task<IActionResult> AuthenticateGoogle([FromBody] ExternalAuthRequestDto request)
         {
-            var token = CreateToken(await AuthenticateGoogleUserAsync(request));
-            return token;
+            var user = await AuthenticateGoogleUserAsync(request);
+
+            if (user == null)
+            {
+                // Handle the case where user authentication fails
+                return new BadRequestObjectResult(new { Message = "Google authentication failed" });
+            }
+
+            var token = CreateToken(user);
+
+            return new OkObjectResult(new
+            {
+                token = token,
+                user = user
+            });
         }
 
-        public async Task<IdentityUser> AuthenticateGoogleUserAsync(ExternalAuthRequestDto request)
+        public async Task<AppUser> AuthenticateGoogleUserAsync(ExternalAuthRequestDto request)
         {
             try
             {
@@ -54,7 +66,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
         }
 
 
-        private async Task<IdentityUser> GetOrCreateExternalLoginUser(string provider, string key, string email, string firstName, string lastName)
+        private async Task<AppUser> GetOrCreateExternalLoginUser(string provider, string key, string email, string firstName, string lastName)
         {
             var user = await _userRepository.FindByLoginAsync(provider, key);
 

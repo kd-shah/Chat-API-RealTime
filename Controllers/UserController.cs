@@ -26,7 +26,7 @@ namespace RealTimeChatApi.Controllers
 
 
         [HttpPost("GoogleAuthenticate")]
-        public async Task<string> GoogleAuthenticate([FromBody] ExternalAuthRequestDto request)
+        public async Task<Object> GoogleAuthenticate([FromBody] ExternalAuthRequestDto request)
         {
             return await _userService.AuthenticateGoogle(request);
         }
