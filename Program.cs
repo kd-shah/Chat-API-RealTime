@@ -137,6 +137,8 @@ namespace RealTimeChatApi
                   //googleoptions.CallbackPath = "/signin-google";
               });
 
+            builder.Services.AddSignalR();
+
 
 
 
@@ -166,18 +168,18 @@ namespace RealTimeChatApi
 
 
             app.MapControllers();
-
-            //app.UseCors("AllowAll");
-            app.UseCors("SwaggerPolicy");
+            app.MapHub<ChatHub>("/hub/chat");
 
             //app.UseEndpoints(endpoints =>
             //{
-            //    // Your existing endpoints here
-
-            //    endpoints.MapHub<ChatHub>("/chat-hub"); // Add this line
+            //    endpoints.MapControllers();
+            //    endpoints.MapHub<ChatHub>("/hub/chat");
             //});
 
-            app.MapHub<ChatHub>("chat-hub");
+            app.UseCors("SwaggerPolicy");
+            //app.MapHub<ChatHub>("/hub/chat");
+
+
 
             app.Run();
         }

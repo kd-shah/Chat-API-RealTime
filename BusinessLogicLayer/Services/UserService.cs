@@ -16,19 +16,20 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
 {
     public class UserService : IUserService
     {
-       
-        
+
+
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
-        
-        public UserService( IUserRepository userRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        private static readonly Dictionary<string, string> Users = new Dictionary<string, string>();
+
+        public UserService(IUserRepository userRepository, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
-           
+
             _configuration = configuration;
             _userRepository = userRepository;
         }
 
-        
+
         public async Task<IActionResult> AuthenticateGoogle([FromBody] ExternalAuthRequestDto request)
         {
             var user = await AuthenticateGoogleUserAsync(request);
@@ -61,7 +62,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             }
             catch (InvalidJwtException ex)
             {
-                throw; 
+                throw;
             }
         }
 
@@ -75,7 +76,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 return user;
 
             }
-                
+
 
             var existingUser = await _userRepository.CheckExistingEmail(email);
 
@@ -89,7 +90,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                     UserName = email,
                     Id = key,
                     Token = "",
-                    Name = firstName, 
+                    Name = firstName,
                 };
 
                 var result = await _userRepository.RegisterGoogleUser(user);
@@ -102,7 +103,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
 
             // Add the external login information to the user
             var info = new UserLoginInfo(provider, key, provider.ToUpperInvariant());
-            
+
             var addLoginResult = await _userRepository.AuthenticateGoogleUser(user, info);
 
             if (addLoginResult.Succeeded)
@@ -152,7 +153,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
 
             if (result.Succeeded)
             {
-                
+
                 return new OkObjectResult(new { Message = "User Registered", newUser });
             }
             else
@@ -170,9 +171,9 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             if (!IsValidEmail(UserObj.email))
                 return new BadRequestObjectResult(new { Message = "Invalid email format" });
 
-           
+
             var user = await _userRepository.CheckEmail(UserObj);
-           
+
             if (user == null)
                 return new NotFoundObjectResult(new { Message = "Login failed due to incorrect credentials" });
 
@@ -193,7 +194,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 return new OkObjectResult(new
                 {
                     Message = "Login Success",
-                    UserInfo = response, 
+                    UserInfo = response,
                 });
             }
             else
@@ -295,5 +296,13 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
         }
 
 
+
+
+
+
+
+
+
     }
 }
+
