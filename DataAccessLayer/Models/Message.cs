@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace RealTimeChatApi.DataAccessLayer.Models
 {
@@ -13,8 +14,10 @@ namespace RealTimeChatApi.DataAccessLayer.Models
         public DateTime timestamp { get; set; }
 
         [ForeignKey("senderId")]
+        [JsonIgnore]
         public virtual AppUser sender { get; set; }
         [ForeignKey("receiverId")]
+        [JsonIgnore]
         public virtual AppUser receiver { get; set; }
     }
 }

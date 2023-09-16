@@ -6,11 +6,13 @@ using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Cors;
 
 namespace RealTimeChatApi.Controllers
 {
     [Route("api/")]
     [ApiController]
+    //[EnableCors("SwaggerPolicy")]
     public class UserController : ControllerBase
     {
         public readonly IUserService _userService;
@@ -22,21 +24,9 @@ namespace RealTimeChatApi.Controllers
             _userService = userService;
         }
 
-        //[HttpGet("google-login")]
-        //public async Task <IActionResult> GoogleLogin()
-        //{
-        //    return await _userService.GoogleLogin();
-        //}
-
-        //[HttpGet("google-response")]
-        //[Authorize(AuthenticationSchemes = "Google")]
-        //public async Task<IActionResult> GoogleResponse()
-        //{
-        //    return await _userService.GoogleResponse();
-        //}
 
         [HttpPost("GoogleAuthenticate")]
-        public async Task<string> GoogleAuthenticate([FromBody] ExternalAuthRequestDto request)
+        public async Task<Object> GoogleAuthenticate([FromBody] ExternalAuthRequestDto request)
         {
             return await _userService.AuthenticateGoogle(request);
         }

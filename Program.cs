@@ -18,6 +18,7 @@ using RealTimeChatApi.Hubs;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json.Serialization;
 
 namespace RealTimeChatApi
 {
@@ -37,7 +38,11 @@ namespace RealTimeChatApi
 
 
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            });
+
 
             builder.Services.AddSignalR();
            
@@ -81,6 +86,9 @@ namespace RealTimeChatApi
             });
 
 
+           
+
+
             builder.Services.AddIdentity<AppUser, IdentityRole>()
             .AddEntityFrameworkStores<RealTimeChatDbContext>()
             .AddDefaultTokenProviders();
@@ -91,11 +99,12 @@ namespace RealTimeChatApi
 
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", builder =>
+                options.AddPolicy("SwaggerPolicy", builder =>
                 {
-                    builder.AllowAnyOrigin()
+                    builder.WithOrigins("http://localhost:4200")
+                           .AllowAnyHeader()
                            .AllowAnyMethod()
-                           .AllowAnyHeader();
+                           .AllowCredentials();
                 });
             });
 
@@ -133,8 +142,10 @@ namespace RealTimeChatApi
               {
                   googleoptions.ClientId = googleClientId;
                   googleoptions.ClientSecret = googleClientSecret;
-                  googleoptions.CallbackPath = "/signin-google";
+                  //googleoptions.CallbackPath = "/signin-google";
               });
+
+            
 
 
 
@@ -165,17 +176,18 @@ namespace RealTimeChatApi
 
 
             app.MapControllers();
-
-            app.UseCors("AllowAll");
+            app.MapHub<ChatHub>("/hub/chat");
 
             //app.UseEndpoints(endpoints =>
             //{
-            //    // Your existing endpoints here
-
-            //    endpoints.MapHub<ChatHub>("/chat-hub"); // Add this line
+            //    endpoints.MapControllers();
+            //    endpoints.MapHub<ChatHub>("/hub/chat");
             //});
 
-            app.MapHub<ChatHub>("chat-hub");
+            app.UseCors("SwaggerPolicy");
+            //app.MapHub<ChatHub>("/hub/chat");
+
+
 
             app.Run();
         }

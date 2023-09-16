@@ -6,6 +6,7 @@ using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Models;
 using RealTimeChatApi.Hubs;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace RealTimeChatApi.BusinessLogicLayer.Services
 {
@@ -14,6 +15,8 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
         
         public readonly IMessageRepository _messageRepository;
         private readonly IHubContext<ChatHub> _hubContext;
+        private readonly static ConnectionMapping<string> _connections = new ConnectionMapping<string>();
+
         public MessageService( IMessageRepository messageRepository, IHubContext<ChatHub> hubContext)
         {
             
@@ -57,6 +60,22 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
 
             await _messageRepository.SendMessage(message);
             //await _hubContext.Clients.User(receiverId).SendAsync("ReceiveMessage", request.content);
+
+            foreach (var connectionId in _connections.GetConnections(message.receiverId))
+            {
+                try
+                {
+                    await _hubContext.Clients.Client(connectionId).SendAsync("BroadCast", message);
+
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception
+                    Console.WriteLine($"Error sending message: {ex.Message}");
+                    // Handle the exception or take appropriate action
+                }
+
+            }
 
             var response = new 
             {
