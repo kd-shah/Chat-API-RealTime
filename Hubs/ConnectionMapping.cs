@@ -14,7 +14,7 @@
         }
 
         public void Add(T key, string connectionId)
-        {
+          {
             lock (_connections)
             {
                 HashSet<string> connections;
@@ -22,11 +22,13 @@
                 {
                     connections = new HashSet<string>();
                     _connections.Add(key, connections);
+                    Console.WriteLine($"Added new key: {key}");
                 }
 
                 lock (connections)
                 {
                     connections.Add(connectionId);
+                    Console.WriteLine($"Added connection {connectionId} to key {key}");
                 }
             }
         }

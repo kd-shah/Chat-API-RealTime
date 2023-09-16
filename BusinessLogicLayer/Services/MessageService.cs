@@ -63,7 +63,18 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
 
             foreach (var connectionId in _connections.GetConnections(message.receiverId))
             {
-                await _hubContext.Clients.Client(connectionId).SendAsync("BroadCast", message);
+                try
+                {
+                    await _hubContext.Clients.Client(connectionId).SendAsync("BroadCast", message);
+
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception
+                    Console.WriteLine($"Error sending message: {ex.Message}");
+                    // Handle the exception or take appropriate action
+                }
+
             }
 
             var response = new 

@@ -18,6 +18,7 @@ using RealTimeChatApi.Hubs;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json.Serialization;
 
 namespace RealTimeChatApi
 {
@@ -37,7 +38,11 @@ namespace RealTimeChatApi
 
 
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+            });
+
 
             builder.Services.AddSignalR();
            
@@ -79,6 +84,9 @@ namespace RealTimeChatApi
             {
                 options.UseSqlServer(connectionString);
             });
+
+
+           
 
 
             builder.Services.AddIdentity<AppUser, IdentityRole>()
@@ -137,7 +145,7 @@ namespace RealTimeChatApi
                   //googleoptions.CallbackPath = "/signin-google";
               });
 
-            builder.Services.AddSignalR();
+            
 
 
 

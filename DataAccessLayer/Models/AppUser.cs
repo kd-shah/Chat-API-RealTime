@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 
 namespace RealTimeChatApi.DataAccessLayer.Models
@@ -8,8 +9,9 @@ namespace RealTimeChatApi.DataAccessLayer.Models
         public string Name { get; set; }
       
         public string Token { get; set; }
-
+        [JsonIgnore]
         public virtual ICollection<Message>? sentMessages { get; set; }
+        [JsonIgnore]
         public virtual ICollection<Message>? receivedMessages { get; set; }
     }
 }

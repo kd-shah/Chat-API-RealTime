@@ -14,12 +14,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
 
         Task<IActionResult> GetAllUsers();
 
-        //Task<IActionResult> GoogleLogin();
-
-        //Task<IActionResult> GoogleResponse();
-
         Task<IActionResult> AuthenticateGoogle(ExternalAuthRequestDto request);
 
-        //Task<> AuthenticateGoogleUserAsync(ExternalAuthRequestDto request);
     }
 }

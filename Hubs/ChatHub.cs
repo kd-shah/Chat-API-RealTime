@@ -13,6 +13,7 @@ namespace RealTimeChatApi.Hubs
 
         public ChatHub(IHttpContextAccessor httpContextAccessor)
         {
+            Console.WriteLine("Chathub created");
             _httpContextAccessor = httpContextAccessor;
         }
 

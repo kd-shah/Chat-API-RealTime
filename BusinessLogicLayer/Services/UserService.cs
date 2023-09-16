@@ -223,6 +223,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             return new OkObjectResult(new { users = userList });
         }
 
+        
         public async Task<AppUser> GetCurrentUser()
         {
             return await _userRepository.GetCurrentUser();
@@ -270,7 +271,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             return true;
         }
 
-        private string CreateToken(IdentityUser user)
+        private string CreateToken(AppUser user)
         {
             List<Claim> claims = new List<Claim>
             {
