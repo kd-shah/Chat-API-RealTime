@@ -5,8 +5,9 @@ using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Models;
+using RealTimeChatApi.DataAccessLayer.Repositories;
 using RealTimeChatApi.Hubs;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using System.Linq.Expressions;
 
 namespace RealTimeChatApi.BusinessLogicLayer.Services
 {
@@ -14,13 +15,16 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
     {
         
         public readonly IMessageRepository _messageRepository;
+        public readonly IUserRepository _userRepository;
         private readonly IHubContext<ChatHub> _hubContext;
         private readonly static ConnectionMapping<string> _connections = new ConnectionMapping<string>();
 
-        public MessageService( IMessageRepository messageRepository, IHubContext<ChatHub> hubContext)
+        public MessageService( IMessageRepository messageRepository, IHubContext<ChatHub> hubContext,
+                               IUserRepository userRepository)
         {
             
             _messageRepository = messageRepository;
+            _userRepository = userRepository;
             _hubContext = hubContext;
         }
 
@@ -33,7 +37,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
 
 
             //var senderId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var sender = await _messageRepository.GetSender();
+            var sender = await _userRepository.GetCurrentUser();
             if (sender == null)
             {
                 return new NotFoundObjectResult("Sender not found");
@@ -56,6 +60,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 receiver = receiver,
                 content = content,
                 timestamp = timestamp,
+                isRead = false,
             };
 
             await _messageRepository.SendMessage(message);
@@ -83,7 +88,8 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 senderId = sender.Id,
                 receiverId = receiver.Id,
                 content = content,
-                timestamp = timestamp
+                timestamp = timestamp,
+                isRead = false,
             };
 
             return new OkObjectResult(response);
@@ -92,7 +98,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
         
         public async Task<IActionResult> EditMessage(int messageId, [FromBody] EditMessageRequestDto request)
         {
-            var authenticatedUser = await _messageRepository.GetSender();
+            var authenticatedUser = await _userRepository.GetCurrentUser();
 
             if (request == null)
             {
@@ -114,14 +120,14 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             message.content = request.content;
 
             //await _context.SaveChangesAsync();
-            await _messageRepository.EditMessage(message);
+            await _messageRepository.EditMessage();
 
             return new  OkObjectResult(new { message = "Message edited successfully" });
         }
     
         public async Task<IActionResult>DeleteMessage(int messageId)
         {
-            var authenticatedUser = await _messageRepository.GetSender();
+            var authenticatedUser = await _userRepository.GetCurrentUser();
 
             if (messageId == null)
             {
@@ -144,7 +150,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
         public async Task<IActionResult> GetConversationHistory(string userId, DateTime before, int count , string sort)
         {
 
-            var authenticatedUser = await _messageRepository.GetSender();
+            var authenticatedUser = await _userRepository.GetCurrentUser();
 
             var conversation = await _messageRepository.GetConversationHistory(userId , authenticatedUser);
 
@@ -186,6 +192,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 receiverId = m.receiverId,
                 content = m.content,
                 timestamp = m.timestamp,
+                isRead = m.isRead,
             }).Take(count).ToListAsync();
 
 
@@ -208,7 +215,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 return new BadRequestObjectResult("Invalid keyword");
             }
 
-            var user = await _messageRepository.GetSender();
+            var user = await _userRepository.GetCurrentUser();
 
             if (string.IsNullOrEmpty(user.Id))
             {
@@ -232,6 +239,39 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             });
 
             return new OkObjectResult(response);
+        }
+
+        public async Task<IActionResult> MarkMessagesAsRead(IEnumerable<int> messageId)
+        {
+            var authenticatedUser = await _userRepository.GetCurrentUser();
+
+            if (messageId == null || !messageId.Any())
+            {
+                return new NotFoundObjectResult("No unread messages"); 
+            }
+
+            foreach (int id in messageId)
+            {
+                MessageReadResponseDto message = await _messageRepository.FindMessageById(id);
+
+                if (message == null)
+                {
+                    return new NotFoundObjectResult($"Message with ID {messageId} not found");
+                }
+                if (authenticatedUser.Id == message.receiverId)
+                {
+                    message.isRead = true;
+                    await _messageRepository.MarkMessageAsRead();
+                    Console.WriteLine(message);
+                }
+                else
+                {
+                    return new UnauthorizedObjectResult("Unauthorized");
+                }
+               
+            }
+
+            return new OkObjectResult("Messages marked as read successfully");
         }
     }
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using RealTimeChatApi.BusinessLogicLayer.Interfaces;
+using RealTimeChatApi.DataAccessLayer.Models;
 
 namespace RealTimeChatApi.Controllers
 {
@@ -44,6 +45,12 @@ namespace RealTimeChatApi.Controllers
         public async Task<IActionResult> SearchConversations(string query)
         {
             return await _messageService.SearchConversations(query);
+        }
+
+        [HttpPost("read")]
+        public async Task<IActionResult> MarkMessagesAsRead(IEnumerable<int> messageId)
+        {
+            return await _messageService.MarkMessagesAsRead(messageId);
         }
     }
 }

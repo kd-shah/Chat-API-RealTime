@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
+using RealTimeChatApi.DataAccessLayer.Models;
 
 namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
 {
@@ -14,6 +15,8 @@ namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
         Task<IActionResult> GetConversationHistory(string userId, DateTime before, int count, string sort);
 
         Task<IActionResult> SearchConversations(string query);
+
+        Task<IActionResult> MarkMessagesAsRead(IEnumerable<int> messageId);
     }
 
 }
