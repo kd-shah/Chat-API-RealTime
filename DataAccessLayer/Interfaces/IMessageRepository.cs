@@ -20,8 +20,10 @@ namespace RealTimeChatApi.DataAccessLayer.Interfaces
 
         Task<IQueryable<Message>> SearchMessages(string userId, string query);
 
-        Task<MessageReadResponseDto> FindMessageById(int messageId);
+        Task<Message> FindMessageById(int messageId);
 
-        Task<IActionResult> MarkMessageAsRead();
+        Task<IActionResult> GetAllUnReadMessages(string authenticatedUserId);
+
+        Task<IActionResult> MarkMessageAsRead(Message message);
     }
 }

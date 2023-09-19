@@ -5,7 +5,6 @@ using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Models;
-using RealTimeChatApi.DataAccessLayer.Repositories;
 using RealTimeChatApi.Hubs;
 using System.Linq.Expressions;
 
@@ -235,33 +234,42 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 senderId = message.sender.Id,
                 receiverId = message.receiver.Id,
                 content = message.content,
-                timestamp = message.timestamp
+                timestamp = message.timestamp,
+                isRead = message.isRead,
             });
 
             return new OkObjectResult(response);
         }
 
-        public async Task<IActionResult> MarkMessagesAsRead(IEnumerable<int> messageId)
+        public async Task<IActionResult> GetAllUnReadMessages()
         {
             var authenticatedUser = await _userRepository.GetCurrentUser();
 
-            if (messageId == null || !messageId.Any())
+            var unReadMessages = await _messageRepository.GetAllUnReadMessages(authenticatedUser.Id);
+
+            return unReadMessages;
+        }
+        public async Task<IActionResult> MarkMessagesAsRead([FromBody] int[] array)
+        {
+            var authenticatedUser = await _userRepository.GetCurrentUser();
+             
+            if (array.Length == 0 )
             {
                 return new NotFoundObjectResult("No unread messages"); 
             }
 
-            foreach (int id in messageId)
+            foreach (int id in array)
             {
-                MessageReadResponseDto message = await _messageRepository.FindMessageById(id);
+                Message message = await _messageRepository.FindMessageById(id);
 
                 if (message == null)
                 {
-                    return new NotFoundObjectResult($"Message with ID {messageId} not found");
+                    return new NotFoundObjectResult($"Message with ID {id} not found");
                 }
                 if (authenticatedUser.Id == message.receiverId)
                 {
                     message.isRead = true;
-                    await _messageRepository.MarkMessageAsRead();
+                    await _messageRepository.MarkMessageAsRead(message);
                     Console.WriteLine(message);
                 }
                 else

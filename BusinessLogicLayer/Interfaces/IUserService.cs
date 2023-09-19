@@ -12,7 +12,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
 
         Task<IActionResult> Authenticate(LoginRequestDto UserObj);
 
-        Task<IActionResult> GetAllUsers();
+        Task<IEnumerable<AppUser>> GetAllUsers();
 
         Task<IActionResult> AuthenticateGoogle(ExternalAuthRequestDto request);
 

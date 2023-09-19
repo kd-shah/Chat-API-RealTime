@@ -88,28 +88,40 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             return messages;
         }
 
-        public async Task<MessageReadResponseDto> FindMessageById(int messageId)
+        public async Task<Message> FindMessageById(int messageId)
         {
-            MessageReadResponseDto message =  _context.Messages.Where(m => m.messageId == messageId)
-                            .Select(m => new MessageReadResponseDto
-                              {
-                                  messageId = m.messageId,
-                                  senderId = m.senderId,
-                                  receiverId = m.receiverId,
-                                  content = m.content,
-                                  timestamp = m.timestamp,
 
-                              })
-                            .FirstOrDefault();
+            Message message = _context.Messages.FirstOrDefault(m => m.messageId == messageId);
 
             return message;
         }
 
-        public async Task<IActionResult> MarkMessageAsRead()
+        public async Task<IActionResult> GetAllUnReadMessages(string authenticatedUserId)
         {
-            //_context.Entry(message).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return new OkObjectResult("Message read successfully");
+            var unReadMessages = _context.Messages.Where(m => m.receiverId == authenticatedUserId
+                                                        && m.isRead == false)
+                                                            .GroupBy(message => message.senderId)
+                                                             .Select(group => new
+                                                            {
+                                                            SenderId = group.Key,
+                                                            Messages = group.ToList()
+                                                             })
+                                                             .ToList(); 
+
+            return new OkObjectResult(unReadMessages);
+        }
+
+        public async Task<IActionResult> MarkMessageAsRead(Message message)
+        {
+            try
+            {
+                await _context.SaveChangesAsync();
+                return new OkObjectResult("Message read successfully");
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

@@ -47,10 +47,16 @@ namespace RealTimeChatApi.Controllers
             return await _messageService.SearchConversations(query);
         }
 
-        [HttpPost("read")]
-        public async Task<IActionResult> MarkMessagesAsRead(IEnumerable<int> messageId)
+        [HttpGet("unread")]
+        public async Task<IActionResult> GetAllUnReadMessages()
         {
-            return await _messageService.MarkMessagesAsRead(messageId);
+            return await _messageService.GetAllUnReadMessages();
+        }
+
+        [HttpPut("read")]
+        public async Task<IActionResult> MarkMessagesAsRead([FromBody] int[] array)
+        {
+            return await _messageService.MarkMessagesAsRead(array);
         }
     }
 }

@@ -16,7 +16,8 @@ namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
 
         Task<IActionResult> SearchConversations(string query);
 
-        Task<IActionResult> MarkMessagesAsRead(IEnumerable<int> messageId);
+        Task<IActionResult> GetAllUnReadMessages();
+        Task<IActionResult> MarkMessagesAsRead([FromBody] int[] array);
     }
 
 }
