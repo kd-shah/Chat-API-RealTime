@@ -255,7 +255,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
              
             if (array.Length == 0 )
             {
-                return new NotFoundObjectResult("No unread messages"); 
+                return new OkObjectResult(new { message = "Messages marked as read successfully" });
             }
 
             foreach (int id in array)
@@ -279,7 +279,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                
             }
 
-            return new OkObjectResult("Messages marked as read successfully");
+            return new OkObjectResult(new { message = "Messages marked as read successfully" });
         }
     }
 
