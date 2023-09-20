@@ -1,19 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using RealTimeChatApi.DataAccessLayer.Models;
 
 namespace RealTimeChatApi.DataAccessLayer.Interfaces
 {
     public interface IMessageRepository
     {
-        Task<AppUser> GetSender();
-
         Task<AppUser> GetReceiver(string receiverId);
 
         Task<Message> GetMessage(int messageId);
 
         Task<IActionResult> SendMessage(Message message);
 
-        Task<IActionResult> EditMessage(Message message);
+        Task<IActionResult> EditMessage();
 
         Task<IActionResult> DeleteMessage(Message message);
 
@@ -21,5 +20,10 @@ namespace RealTimeChatApi.DataAccessLayer.Interfaces
 
         Task<IQueryable<Message>> SearchMessages(string userId, string query);
 
+        Task<Message> FindMessageById(int messageId);
+
+        Task<IActionResult> GetAllUnReadMessages(string authenticatedUserId);
+
+        Task<IActionResult> MarkMessageAsRead(Message message);
     }
 }

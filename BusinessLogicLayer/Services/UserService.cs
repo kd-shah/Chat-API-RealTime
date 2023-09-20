@@ -208,19 +208,19 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
 
         }
 
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IEnumerable<AppUser>> GetAllUsers()
         {
             var currentUser = await GetCurrentUser();
 
             if (currentUser.Id == null)
             {
-                return new BadRequestObjectResult(new { Message = "Unable to retrieve current user." });
+                throw new Exception("Unable to retrieve current user.");
             }
 
             var userList = await _userRepository.GetAllUsers(currentUser.Id);
 
 
-            return new OkObjectResult(new { users = userList });
+            return userList;
         }
 
         

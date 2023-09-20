@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using RealTimeChatApi.BusinessLogicLayer.Interfaces;
+using RealTimeChatApi.DataAccessLayer.Models;
 
 namespace RealTimeChatApi.Controllers
 {
@@ -44,6 +45,18 @@ namespace RealTimeChatApi.Controllers
         public async Task<IActionResult> SearchConversations(string query)
         {
             return await _messageService.SearchConversations(query);
+        }
+
+        [HttpGet("unread")]
+        public async Task<IActionResult> GetAllUnReadMessages()
+        {
+            return await _messageService.GetAllUnReadMessages();
+        }
+
+        [HttpPut("read")]
+        public async Task<IActionResult> MarkMessagesAsRead([FromBody] int[] array)
+        {
+            return await _messageService.MarkMessagesAsRead(array);
         }
     }
 }

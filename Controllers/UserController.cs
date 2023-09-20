@@ -47,7 +47,7 @@ namespace RealTimeChatApi.Controllers
 
         [Authorize]
         [HttpGet("users")]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IEnumerable<AppUser>> GetAllUsers()
         {
 
             return await _userService.GetAllUsers();
