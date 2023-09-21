@@ -4,16 +4,20 @@ using System.Text.Json.Serialization;
 
 namespace RealTimeChatApi.DataAccessLayer.Models
 {
-    public class Message
+    public class File
     {
         [Key]
-        public int messageId { get; set; }
+        public int fileId { get; set; }
+        public string fileName { get; set; }
+        public long fileSize { get; set; }
+
+        public string? caption { get; set; }
+        public string contentType { get; set; }
+        public DateTime uploadDateTime { get; set; }
         public string senderId { get; set; }
         public string receiverId { get; set; }
-        public string content { get; set; }
-        public DateTime timestamp { get; set; }
-        
-        public bool isRead { get; set; } 
+        public string filePath { get; set; }
+        public bool isRead { get; set; }
 
         [ForeignKey("senderId")]
         [JsonIgnore]
@@ -22,12 +26,12 @@ namespace RealTimeChatApi.DataAccessLayer.Models
         [JsonIgnore]
         public virtual AppUser receiver { get; set; }
 
-        public bool IsFile { get; set; }
-        
-        [ForeignKey("fileId")]
-        public int? fileId { get; set; }
+        [ForeignKey("messageId")]
+        public int messageId { get; set; }
         [JsonIgnore]
-        public virtual File AttachedFile { get; set; } 
+        public virtual Message Message { get; set; }
+
+
+
     }
 }
-

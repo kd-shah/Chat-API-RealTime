@@ -9,9 +9,15 @@ namespace RealTimeChatApi.DataAccessLayer.Models
         public string Name { get; set; }
       
         public string Token { get; set; }
+
         [JsonIgnore]
         public virtual ICollection<Message>? sentMessages { get; set; }
         [JsonIgnore]
         public virtual ICollection<Message>? receivedMessages { get; set; }
+
+        [JsonIgnore]
+        public virtual ICollection<File>? sentFiles{ get; set; }
+        [JsonIgnore]
+        public virtual ICollection<File>? receivedFiles { get; set; }
     }
 }

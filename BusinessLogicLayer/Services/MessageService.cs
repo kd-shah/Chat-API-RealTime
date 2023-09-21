@@ -60,6 +60,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 content = content,
                 timestamp = timestamp,
                 isRead = false,
+                IsFile = false,
             };
 
             await _messageRepository.SendMessage(message);
@@ -89,6 +90,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 content = content,
                 timestamp = timestamp,
                 isRead = false,
+                isFile = false,
             };
 
             return new OkObjectResult(response);
@@ -121,6 +123,22 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             //await _context.SaveChangesAsync();
             await _messageRepository.EditMessage();
 
+            foreach (var connectionId in _connections.GetConnections(message.receiverId))
+            {
+                try
+                {
+                    await _hubContext.Clients.Client(connectionId).SendAsync("BroadCast", message);
+
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception
+                    Console.WriteLine($"Error sending message: {ex.Message}");
+                    // Handle the exception or take appropriate action
+                }
+
+            }
+
             return new  OkObjectResult(new { message = "Message edited successfully" });
         }
     
@@ -146,66 +164,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             return new OkObjectResult(new { message = "Message Deleted successfully" });
         }
 
-        public async Task<IActionResult> GetConversationHistory(string userId, DateTime before, int count , string sort)
-        {
-
-            var authenticatedUser = await _userRepository.GetCurrentUser();
-
-            var conversation = await _messageRepository.GetConversationHistory(userId , authenticatedUser);
-
-            var receiver = await _messageRepository.GetReceiver(userId);
-
-
-            if (receiver == null)
-            {
-                return new NotFoundObjectResult("User not found");
-            }
-
-
-            if (before != default(DateTime))
-            {
-                conversation = conversation.Where(m => m.timestamp < before);
-            }
-
-            if (before > DateTime.Now)
-            {
-                return new BadRequestObjectResult("Invalid Before Parameter");
-            }
-
-            if (sort != "asc" && sort != "desc")
-            {
-                return new BadRequestObjectResult("Invalid Request Parameter");
-            }
-
-            if (count <= 0)
-            {
-                return new BadRequestObjectResult("Invalid Request Parameter : Chat Count cannot be zero or negative");
-            }
-            
-            conversation = sort == "asc" ? conversation.OrderBy(m => m.timestamp) : conversation.OrderByDescending(m => m.timestamp);
-
-            var chat = await conversation.Select(m => new
-            {
-                id = m.messageId,
-                senderId = m.senderId,
-                receiverId = m.receiverId,
-                content = m.content,
-                timestamp = m.timestamp,
-                isRead = m.isRead,
-            }).Take(count).ToListAsync();
-
-
-
-            if (chat.Count == 0)
-            {
-                //return NotFound("Conversation does not exist");
-                return new OkObjectResult(new List<object>());
-            }
-
-            return new OkObjectResult(chat);
-
-
-        }
+        
         
         public async Task<IActionResult> SearchConversations(string query)
         {
@@ -249,6 +208,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
 
             return unReadMessages;
         }
+
         public async Task<IActionResult> MarkMessagesAsRead([FromBody] int[] array)
         {
             var authenticatedUser = await _userRepository.GetCurrentUser();
@@ -280,6 +240,69 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             }
 
             return new OkObjectResult(new { message = "Messages marked as read successfully" });
+        }
+
+
+        public async Task<IActionResult> GetConversationHistory(string userId, DateTime before, int count, string sort)
+        {
+
+            var authenticatedUser = await _userRepository.GetCurrentUser();
+
+            var conversation = await _messageRepository.GetConversationHistory(userId, authenticatedUser);
+
+            var receiver = await _messageRepository.GetReceiver(userId);
+
+
+            if (receiver == null)
+            {
+                return new NotFoundObjectResult("User not found");
+            }
+
+
+            if (before != default(DateTime))
+            {
+                conversation = conversation.Where(m => m.timestamp < before);
+            }
+
+            if (before > DateTime.Now)
+            {
+                return new BadRequestObjectResult("Invalid Before Parameter");
+            }
+
+            if (sort != "asc" && sort != "desc")
+            {
+                return new BadRequestObjectResult("Invalid Request Parameter");
+            }
+
+            if (count <= 0)
+            {
+                return new BadRequestObjectResult("Invalid Request Parameter : Chat Count cannot be zero or negative");
+            }
+
+            conversation = sort == "asc" ? conversation.OrderBy(m => m.timestamp) : conversation.OrderByDescending(m => m.timestamp);
+
+            var chat = await conversation.Select(m => new
+            {
+                id = m.messageId,
+                senderId = m.senderId,
+                receiverId = m.receiverId,
+                content = m.content,
+                timestamp = m.timestamp,
+                isRead = m.isRead,
+                isFile = m.IsFile,
+            }).Take(count).ToListAsync();
+
+
+
+            if (chat.Count == 0)
+            {
+                //return NotFound("Conversation does not exist");
+                return new OkObjectResult(new List<object>());
+            }
+
+            return new OkObjectResult(chat);
+
+
         }
     }
 

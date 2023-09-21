@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using RealTimeChatApi.DataAccessLayer.Models;
+using File = RealTimeChatApi.DataAccessLayer.Models.File;
 
 namespace RealTimeChatApi.DataAccessLayer.Data
 {
@@ -15,6 +16,7 @@ namespace RealTimeChatApi.DataAccessLayer.Data
 
         public DbSet<Log> Logs { get; set; }
 
+        public DbSet<File> Files { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //modelBuilder.Entity<IdentityUser>().ToTable("users");
@@ -25,9 +27,6 @@ namespace RealTimeChatApi.DataAccessLayer.Data
             modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("AspNetUserClaims").HasKey(uc => uc.Id);
             modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("AspNetUserLogins").HasKey(ul => new { ul.LoginProvider, ul.ProviderKey });
             modelBuilder.Entity<IdentityUserToken<string>>().ToTable("AspNetUserTokens").HasKey(ut => new { ut.UserId, ut.LoginProvider, ut.Name });
-
-            //modelBuilder.Entity<IdentityUserLogin<string>>().HasNoKey();
-            //modelBuilder.Entity<IdentityUserRole<string>>().HasNoKey();
 
 
             modelBuilder.Entity<Message>()
@@ -42,6 +41,22 @@ namespace RealTimeChatApi.DataAccessLayer.Data
                 .HasForeignKey(m => m.receiverId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
+            modelBuilder.Entity<File>()
+                .HasOne(f => f.receiver)
+                .WithMany(u => u.receivedFiles)
+                .HasForeignKey(f => f.receiverId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            modelBuilder.Entity<File>()
+                .HasOne(f => f.sender)
+                .WithMany(u => u.sentFiles)
+                .HasForeignKey(f => f.senderId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            modelBuilder.Entity<File>()
+                .HasOne(f => f.Message)         
+                .WithOne(m => m.AttachedFile)  
+                .HasForeignKey<Message>(m => m.fileId);
 
         }
     }

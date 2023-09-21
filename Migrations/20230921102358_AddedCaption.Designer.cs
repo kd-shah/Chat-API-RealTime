@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RealTimeChatApi.DataAccessLayer.Data;
 
@@ -11,9 +12,11 @@ using RealTimeChatApi.DataAccessLayer.Data;
 namespace RealTimeChatApi.Migrations
 {
     [DbContext(typeof(RealTimeChatDbContext))]
-    partial class RealTimeChatDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230921102358_AddedCaption")]
+    partial class AddedCaption
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -225,9 +228,6 @@ namespace RealTimeChatApi.Migrations
                     b.Property<bool>("isRead")
                         .HasColumnType("bit");
 
-                    b.Property<int>("messageId")
-                        .HasColumnType("int");
-
                     b.Property<string>("receiverId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -280,15 +280,9 @@ namespace RealTimeChatApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("messageId"));
 
-                    b.Property<bool>("IsFile")
-                        .HasColumnType("bit");
-
                     b.Property<string>("content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("fileId")
-                        .HasColumnType("int");
 
                     b.Property<bool>("isRead")
                         .HasColumnType("bit");
@@ -305,10 +299,6 @@ namespace RealTimeChatApi.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("messageId");
-
-                    b.HasIndex("fileId")
-                        .IsUnique()
-                        .HasFilter("[fileId] IS NOT NULL");
 
                     b.HasIndex("receiverId");
 
@@ -336,10 +326,6 @@ namespace RealTimeChatApi.Migrations
 
             modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.Message", b =>
                 {
-                    b.HasOne("RealTimeChatApi.DataAccessLayer.Models.File", "AttachedFile")
-                        .WithOne("Message")
-                        .HasForeignKey("RealTimeChatApi.DataAccessLayer.Models.Message", "fileId");
-
                     b.HasOne("RealTimeChatApi.DataAccessLayer.Models.AppUser", "receiver")
                         .WithMany("receivedMessages")
                         .HasForeignKey("receiverId")
@@ -349,8 +335,6 @@ namespace RealTimeChatApi.Migrations
                         .WithMany("sentMessages")
                         .HasForeignKey("senderId")
                         .IsRequired();
-
-                    b.Navigation("AttachedFile");
 
                     b.Navigation("receiver");
 
@@ -366,12 +350,6 @@ namespace RealTimeChatApi.Migrations
                     b.Navigation("sentFiles");
 
                     b.Navigation("sentMessages");
-                });
-
-            modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.File", b =>
-                {
-                    b.Navigation("Message")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
