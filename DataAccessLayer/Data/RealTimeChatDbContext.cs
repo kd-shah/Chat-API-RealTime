@@ -41,11 +41,6 @@ namespace RealTimeChatApi.DataAccessLayer.Data
                 .HasForeignKey(m => m.receiverId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
-            modelBuilder.Entity<Message>()
-                .HasOne(m => m.AttachedFile)
-                .WithOne(f => f.Message)
-                .HasForeignKey<File>(f => f.messageId);
-
             modelBuilder.Entity<File>()
                 .HasOne(f => f.receiver)
                 .WithMany(u => u.receivedFiles)
@@ -58,10 +53,18 @@ namespace RealTimeChatApi.DataAccessLayer.Data
                 .HasForeignKey(f => f.senderId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
+            
+            
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.AttachedFile)
+                .WithOne(f => f.Message)
+                .HasForeignKey<File>(f => f.messageId);
+
             modelBuilder.Entity<File>()
                 .HasOne(f => f.Message)         
                 .WithOne(m => m.AttachedFile)  
-                .HasForeignKey<Message>(m => m.fileId);
+                .HasForeignKey<Message>(m => m.fileId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
     }

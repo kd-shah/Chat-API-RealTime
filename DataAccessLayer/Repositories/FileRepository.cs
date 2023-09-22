@@ -61,5 +61,13 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             var file = _context.Files.FirstOrDefault(f => f.fileId == fileId);
             return file;
         }
+
+        public async Task<IActionResult> SaveFileChanges()
+        {
+
+            await _context.SaveChangesAsync();
+
+            return null;
+        }
     }
 }

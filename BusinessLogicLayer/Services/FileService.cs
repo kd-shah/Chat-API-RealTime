@@ -53,6 +53,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 };
                 await _fileRepository.SendFile(fileMetaData);
 
+                
                 var message = new Message
                 {
                     sender = authenticatedUser,
@@ -66,6 +67,19 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 
                 await _messageRepository.SendMessage(message);
                 
+                int messageId = message.messageId;
+
+
+                File savedFile = await _fileRepository.GetFileById(fileMetaData.fileId);
+
+                if(savedFile != null)
+                {
+                    savedFile.messageId = messageId;
+                    await _fileRepository.SaveFileChanges();
+
+                }
+                
+
 
                 return new OkObjectResult(new { File = fileMetaData });
             }

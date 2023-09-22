@@ -25,11 +25,8 @@ namespace RealTimeChatApi.DataAccessLayer.Models
         [ForeignKey("receiverId")]
         [JsonIgnore]
         public virtual AppUser receiver { get; set; }
-
-        [ForeignKey("messageId")]
         public int messageId { get; set; }
-        [JsonIgnore]
-        public virtual Message Message { get; set; }
+       
 
 
 

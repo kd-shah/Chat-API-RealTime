@@ -24,7 +24,6 @@ namespace RealTimeChatApi.DataAccessLayer.Models
 
         public bool IsFile { get; set; }
         
-        [ForeignKey("fileId")]
         public int? fileId { get; set; }
         [JsonIgnore]
         public virtual File AttachedFile { get; set; } 

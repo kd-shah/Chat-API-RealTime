@@ -15,5 +15,7 @@ namespace RealTimeChatApi.DataAccessLayer.Interfaces
         Task<IQueryable<File>> GetFiles(AppUser receiver, AppUser authenticatedUser);
 
         Task<File>GetFileById(int fileId);
+
+        Task<IActionResult> SaveFileChanges();
     }
 }
