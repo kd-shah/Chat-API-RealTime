@@ -55,5 +55,11 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
 
             return files;
         }
+
+        public async Task<File> GetFileById(int fileId)
+        {
+            var file = _context.Files.FirstOrDefault(f => f.fileId == fileId);
+            return file;
+        }
     }
 }

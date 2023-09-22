@@ -24,10 +24,16 @@ namespace RealTimeChatApi.Controllers
             return await _fileService.SendFile(request);
         }
 
-        [HttpGet("download")]
-        public async Task<IActionResult> ReceiveFile(ReceiveFilesRequestDto request)
+        [HttpGet("files")]
+        public async Task<IActionResult> ReceiveFile([FromQuery]ReceiveFilesRequestDto request)
         {
             return await _fileService.GetFiles(request);
+        }
+
+        [HttpGet("download")]
+        public async Task<IActionResult> DownloadFile([FromQuery]DownloadFileRequestDto request)
+        {
+            return await _fileService.DownloadFile(request);
         }
     }
 }

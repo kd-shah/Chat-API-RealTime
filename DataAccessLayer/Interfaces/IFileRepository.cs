@@ -13,5 +13,7 @@ namespace RealTimeChatApi.DataAccessLayer.Interfaces
         Task<IActionResult> SendFile(File fileMetaData);
 
         Task<IQueryable<File>> GetFiles(AppUser receiver, AppUser authenticatedUser);
+
+        Task<File>GetFileById(int fileId);
     }
 }

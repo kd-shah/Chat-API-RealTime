@@ -7,5 +7,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Interfaces
     {
         Task<IActionResult> SendFile(SendFileRequestDto request);
         Task<IActionResult> GetFiles(ReceiveFilesRequestDto request);
+
+        Task<IActionResult> DownloadFile(DownloadFileRequestDto request);
     }
 }

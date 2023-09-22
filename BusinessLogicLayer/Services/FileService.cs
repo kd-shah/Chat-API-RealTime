@@ -36,19 +36,22 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             {
                 var filePath = await _fileRepository.SaveFilesLocally(request.file);
 
+               
+
                 var fileMetaData = new File
                 {
                     fileName = request.file.FileName,
                     fileSize = request.file.Length,
                     contentType = request.file.ContentType,
                     caption = request.caption,
-                    //senderId = authenticatedUser.Id,
                     sender = authenticatedUser,
                     receiver = receiver,
                     filePath = filePath,
                     uploadDateTime = DateTime.Now,
                     isRead = false,
+                    //Message = message
                 };
+                await _fileRepository.SendFile(fileMetaData);
 
                 var message = new Message
                 {
@@ -58,15 +61,16 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                     timestamp = DateTime.Now,
                     isRead = false,
                     IsFile = true,
+                    fileId= fileMetaData.fileId,
                 };
-
-                await _fileRepository.SendFile(fileMetaData);
+                
                 await _messageRepository.SendMessage(message);
+                
 
                 return new OkObjectResult(new { File = fileMetaData });
             }
             catch (Exception ex) {
-                return new BadRequestObjectResult(new {Message = "Error Occured" });
+                return new BadRequestObjectResult(new {Message = ex });
             }
         } 
 
@@ -80,6 +84,32 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             return new OkObjectResult(files);
         }
 
-        
+        public async Task<IActionResult> DownloadFile(DownloadFileRequestDto request)
+        {
+            var authenticatedUser = await _userRepository.GetCurrentUser();
+
+            var file = await _fileRepository.GetFileById(request.fileId);
+
+            if (file == null)
+            {
+                return new NotFoundObjectResult(new { message = "File not found" });
+            }
+
+            if (file.senderId != authenticatedUser.Id && file.receiverId != authenticatedUser.Id)
+            {
+                return new UnauthorizedObjectResult(new { message = "Unauthorized access" });
+            }
+
+            var contentType = file.contentType;
+            var fileStream = new FileStream(file.filePath, FileMode.Open, FileAccess.Read);
+
+            return new FileStreamResult(fileStream, contentType)
+            {
+                FileDownloadName = file.fileName
+            };
+
+        }
+
+
     }
 }

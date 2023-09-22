@@ -290,6 +290,11 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 timestamp = m.timestamp,
                 isRead = m.isRead,
                 isFile = m.IsFile,
+                fileId = m.AttachedFile != null? m.AttachedFile.fileId : (int?)null,
+                fileName = m.AttachedFile != null? m.AttachedFile.fileName : null,
+                fileSize = m.AttachedFile !=null? m.AttachedFile.fileSize : (long?)null,
+                caption = m.AttachedFile != null ? m.AttachedFile.caption : null,
+                contentType = m.AttachedFile != null ? m.AttachedFile.contentType : null,
             }).Take(count).ToListAsync();
 
 
