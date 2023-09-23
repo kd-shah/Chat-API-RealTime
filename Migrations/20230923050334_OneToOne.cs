@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace RealTimeChatApi.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class OneToOne : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -108,6 +108,21 @@ namespace RealTimeChatApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Logs",
+                columns: table => new
+                {
+                    logId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ipAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    requestBody = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    timeStamp = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Logs", x => x.logId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RoleClaims",
                 columns: table => new
                 {
@@ -121,6 +136,99 @@ namespace RealTimeChatApi.Migrations
                 {
                     table.PrimaryKey("PK_RoleClaims", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Messages",
+                columns: table => new
+                {
+                    messageId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    senderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    receiverId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    content = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    isRead = table.Column<bool>(type: "bit", nullable: false),
+                    IsFile = table.Column<bool>(type: "bit", nullable: false),
+                    fileId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Messages", x => x.messageId);
+                    table.ForeignKey(
+                        name: "FK_Messages_AspNetUsers_receiverId",
+                        column: x => x.receiverId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Messages_AspNetUsers_senderId",
+                        column: x => x.senderId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Files",
+                columns: table => new
+                {
+                    fileId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    fileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    fileSize = table.Column<long>(type: "bigint", nullable: false),
+                    caption = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    contentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    uploadDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    senderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    receiverId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    filePath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    isRead = table.Column<bool>(type: "bit", nullable: false),
+                    messageId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Files", x => x.fileId);
+                    table.ForeignKey(
+                        name: "FK_Files_AspNetUsers_receiverId",
+                        column: x => x.receiverId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Files_AspNetUsers_senderId",
+                        column: x => x.senderId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Files_Messages_messageId",
+                        column: x => x.messageId,
+                        principalTable: "Messages",
+                        principalColumn: "messageId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Files_messageId",
+                table: "Files",
+                column: "messageId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Files_receiverId",
+                table: "Files",
+                column: "receiverId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Files_senderId",
+                table: "Files",
+                column: "senderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_receiverId",
+                table: "Messages",
+                column: "receiverId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Messages_senderId",
+                table: "Messages",
+                column: "senderId");
         }
 
         /// <inheritdoc />
@@ -139,13 +247,22 @@ namespace RealTimeChatApi.Migrations
                 name: "AspNetUserRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Files");
+
+            migrationBuilder.DropTable(
+                name: "Logs");
+
+            migrationBuilder.DropTable(
                 name: "RoleClaims");
+
+            migrationBuilder.DropTable(
+                name: "Messages");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

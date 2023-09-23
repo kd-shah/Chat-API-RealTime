@@ -62,12 +62,6 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             return file;
         }
 
-        public async Task<IActionResult> SaveFileChanges()
-        {
-
-            await _context.SaveChangesAsync();
-
-            return null;
-        }
+       
     }
 }

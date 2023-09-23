@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿ using Microsoft.AspNetCore.Mvc;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
@@ -36,7 +36,22 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             {
                 var filePath = await _fileRepository.SaveFilesLocally(request.file);
 
-               
+
+
+
+
+
+                var message = new Message
+                {
+                    sender = authenticatedUser,
+                    receiver = receiver,
+                    content = request.file.FileName,
+                    timestamp = DateTime.Now,
+                    isRead = false,
+                    IsFile = true,
+                };
+
+                await _messageRepository.SendMessage(message);
 
                 var fileMetaData = new File
                 {
@@ -49,36 +64,23 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                     filePath = filePath,
                     uploadDateTime = DateTime.Now,
                     isRead = false,
-                    //Message = message
+                    messageId = message.messageId,
                 };
                 await _fileRepository.SendFile(fileMetaData);
 
                 
-                var message = new Message
+
+                int fileId = fileMetaData.fileId;
+
+                Message savedMessage = await _messageRepository.FindMessageById(message.messageId);
+
+                if (savedMessage != null)
                 {
-                    sender = authenticatedUser,
-                    receiver = receiver,
-                    content = request.file.FileName,
-                    timestamp = DateTime.Now,
-                    isRead = false,
-                    IsFile = true,
-                    fileId= fileMetaData.fileId,
-                };
-                
-                await _messageRepository.SendMessage(message);
-                
-                int messageId = message.messageId;
-
-
-                File savedFile = await _fileRepository.GetFileById(fileMetaData.fileId);
-
-                if(savedFile != null)
-                {
-                    savedFile.messageId = messageId;
-                    await _fileRepository.SaveFileChanges();
+                    savedMessage.fileId = fileId;
+                    await _messageRepository.SaveMessageChanges();
 
                 }
-                
+
 
 
                 return new OkObjectResult(new { File = fileMetaData });

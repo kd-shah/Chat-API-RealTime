@@ -295,6 +295,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 fileSize = m.AttachedFile !=null? m.AttachedFile.fileSize : (long?)null,
                 caption = m.AttachedFile != null ? m.AttachedFile.caption : null,
                 contentType = m.AttachedFile != null ? m.AttachedFile.contentType : null,
+                filePath= m.AttachedFile != null? m.AttachedFile.filePath : null,
             }).Take(count).ToListAsync();
 
 

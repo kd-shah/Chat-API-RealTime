@@ -241,6 +241,9 @@ namespace RealTimeChatApi.Migrations
 
                     b.HasKey("fileId");
 
+                    b.HasIndex("messageId")
+                        .IsUnique();
+
                     b.HasIndex("receiverId");
 
                     b.HasIndex("senderId");
@@ -306,10 +309,6 @@ namespace RealTimeChatApi.Migrations
 
                     b.HasKey("messageId");
 
-                    b.HasIndex("fileId")
-                        .IsUnique()
-                        .HasFilter("[fileId] IS NOT NULL");
-
                     b.HasIndex("receiverId");
 
                     b.HasIndex("senderId");
@@ -319,6 +318,12 @@ namespace RealTimeChatApi.Migrations
 
             modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.File", b =>
                 {
+                    b.HasOne("RealTimeChatApi.DataAccessLayer.Models.Message", "Message")
+                        .WithOne("AttachedFile")
+                        .HasForeignKey("RealTimeChatApi.DataAccessLayer.Models.File", "messageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("RealTimeChatApi.DataAccessLayer.Models.AppUser", "receiver")
                         .WithMany("receivedFiles")
                         .HasForeignKey("receiverId")
@@ -329,6 +334,8 @@ namespace RealTimeChatApi.Migrations
                         .HasForeignKey("senderId")
                         .IsRequired();
 
+                    b.Navigation("Message");
+
                     b.Navigation("receiver");
 
                     b.Navigation("sender");
@@ -336,10 +343,6 @@ namespace RealTimeChatApi.Migrations
 
             modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.Message", b =>
                 {
-                    b.HasOne("RealTimeChatApi.DataAccessLayer.Models.File", "AttachedFile")
-                        .WithOne("Message")
-                        .HasForeignKey("RealTimeChatApi.DataAccessLayer.Models.Message", "fileId");
-
                     b.HasOne("RealTimeChatApi.DataAccessLayer.Models.AppUser", "receiver")
                         .WithMany("receivedMessages")
                         .HasForeignKey("receiverId")
@@ -349,8 +352,6 @@ namespace RealTimeChatApi.Migrations
                         .WithMany("sentMessages")
                         .HasForeignKey("senderId")
                         .IsRequired();
-
-                    b.Navigation("AttachedFile");
 
                     b.Navigation("receiver");
 
@@ -368,9 +369,9 @@ namespace RealTimeChatApi.Migrations
                     b.Navigation("sentMessages");
                 });
 
-            modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.File", b =>
+            modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.Message", b =>
                 {
-                    b.Navigation("Message")
+                    b.Navigation("AttachedFile")
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

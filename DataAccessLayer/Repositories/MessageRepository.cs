@@ -123,5 +123,13 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
+
+        public async Task<IActionResult> SaveMessageChanges()
+        {
+
+            await _context.SaveChangesAsync();
+
+            return null;
+        }
     }
 }
