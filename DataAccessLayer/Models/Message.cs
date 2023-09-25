@@ -13,7 +13,7 @@ namespace RealTimeChatApi.DataAccessLayer.Models
         public string content { get; set; }
         public DateTime timestamp { get; set; }
         
-        public Boolean isRead { get; set; } 
+        public bool isRead { get; set; } 
 
         [ForeignKey("senderId")]
         [JsonIgnore]
@@ -21,5 +21,12 @@ namespace RealTimeChatApi.DataAccessLayer.Models
         [ForeignKey("receiverId")]
         [JsonIgnore]
         public virtual AppUser receiver { get; set; }
+
+        public bool IsFile { get; set; }
+        
+        public int? fileId { get; set; }
+        [JsonIgnore]
+        public virtual File AttachedFile { get; set; } 
     }
 }
+

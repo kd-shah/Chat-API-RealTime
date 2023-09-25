@@ -30,9 +30,7 @@ namespace RealTimeChatApi
 
             builder.Services.AddSignalR();
 
-            // Add services to the container.
-
-            // Add configuration from appsettings.json and other sources
+            
             builder.Configuration.AddJsonFile("appsettings.json");
             builder.Configuration.AddEnvironmentVariables();
 
@@ -42,7 +40,7 @@ namespace RealTimeChatApi
 
             builder.Services.AddSignalR();
            
-            builder.Services.AddHttpContextAccessor(); // Add HttpContextAccessor
+            builder.Services.AddHttpContextAccessor(); 
 
             // Register IActionContextAccessor
             builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
@@ -89,8 +87,7 @@ namespace RealTimeChatApi
             .AddEntityFrameworkStores<RealTimeChatDbContext>()
             .AddDefaultTokenProviders();
 
-            builder.Services.AddTransient<IUserService, UserService>();
-            builder.Services.AddTransient<IUserRepository, UserRepository>();
+            
 
 
             builder.Services.AddCors(options =>
@@ -104,11 +101,18 @@ namespace RealTimeChatApi
                 });
             });
 
+
+            builder.Services.AddTransient<IUserService, UserService>();
+            builder.Services.AddTransient<IUserRepository, UserRepository>();
+
             builder.Services.AddScoped<IMessageService, MessageService>();
             IServiceCollection serviceCollection = builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
             builder.Services.AddTransient<ILogService, LogService>();
             builder.Services.AddTransient<ILogRepository, LogRepository>();
+
+            builder.Services.AddTransient<IFileService, FileService>();
+            builder.Services.AddTransient<IFileRepository, FileRepository>();
 
 
             // Access configuration values

@@ -12,8 +12,8 @@ using RealTimeChatApi.DataAccessLayer.Data;
 namespace RealTimeChatApi.Migrations
 {
     [DbContext(typeof(RealTimeChatDbContext))]
-    [Migration("20230918114146_isReadProperty")]
-    partial class isReadProperty
+    [Migration("20230923050334_OneToOne")]
+    partial class OneToOne
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -199,6 +199,61 @@ namespace RealTimeChatApi.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.File", b =>
+                {
+                    b.Property<int>("fileId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("fileId"));
+
+                    b.Property<string>("caption")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("contentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("fileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("filePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("fileSize")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("isRead")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("messageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("receiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("senderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("uploadDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("fileId");
+
+                    b.HasIndex("messageId")
+                        .IsUnique();
+
+                    b.HasIndex("receiverId");
+
+                    b.HasIndex("senderId");
+
+                    b.ToTable("Files");
+                });
+
             modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.Log", b =>
                 {
                     b.Property<int>("logId")
@@ -231,9 +286,15 @@ namespace RealTimeChatApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("messageId"));
 
+                    b.Property<bool>("IsFile")
+                        .HasColumnType("bit");
+
                     b.Property<string>("content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("fileId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("isRead")
                         .HasColumnType("bit");
@@ -258,6 +319,31 @@ namespace RealTimeChatApi.Migrations
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.File", b =>
+                {
+                    b.HasOne("RealTimeChatApi.DataAccessLayer.Models.Message", "Message")
+                        .WithOne("AttachedFile")
+                        .HasForeignKey("RealTimeChatApi.DataAccessLayer.Models.File", "messageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RealTimeChatApi.DataAccessLayer.Models.AppUser", "receiver")
+                        .WithMany("receivedFiles")
+                        .HasForeignKey("receiverId")
+                        .IsRequired();
+
+                    b.HasOne("RealTimeChatApi.DataAccessLayer.Models.AppUser", "sender")
+                        .WithMany("sentFiles")
+                        .HasForeignKey("senderId")
+                        .IsRequired();
+
+                    b.Navigation("Message");
+
+                    b.Navigation("receiver");
+
+                    b.Navigation("sender");
+                });
+
             modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.Message", b =>
                 {
                     b.HasOne("RealTimeChatApi.DataAccessLayer.Models.AppUser", "receiver")
@@ -277,9 +363,19 @@ namespace RealTimeChatApi.Migrations
 
             modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.AppUser", b =>
                 {
+                    b.Navigation("receivedFiles");
+
                     b.Navigation("receivedMessages");
 
+                    b.Navigation("sentFiles");
+
                     b.Navigation("sentMessages");
+                });
+
+            modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.Message", b =>
+                {
+                    b.Navigation("AttachedFile")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

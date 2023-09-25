@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using RealTimeChatApi.DataAccessLayer.Data;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Models;
-using System.Security.Claims;
 
 namespace RealTimeChatApi.DataAccessLayer.Repositories
 {
@@ -70,8 +68,10 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
 
         public async Task<IQueryable<Message>> GetConversationHistory(string id, AppUser authenticatedUser) 
         {
-            var conversation = _context.Messages.Include(m => m.sender)
+            var conversation = _context.Messages
+                .Include(m => m.sender)
                 .Include(m => m.receiver)
+                .Include(m => m.AttachedFile)
                 .Where(m => (m.senderId == authenticatedUser.Id && m.receiverId == id) ||
                             (m.senderId == id && m.receiverId == authenticatedUser.Id));
 
@@ -122,6 +122,14 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             {
                 return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
+        }
+
+        public async Task<IActionResult> SaveMessageChanges()
+        {
+
+            await _context.SaveChangesAsync();
+
+            return null;
         }
     }
 }

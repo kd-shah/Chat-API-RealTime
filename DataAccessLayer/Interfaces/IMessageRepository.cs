@@ -25,5 +25,7 @@ namespace RealTimeChatApi.DataAccessLayer.Interfaces
         Task<IActionResult> GetAllUnReadMessages(string authenticatedUserId);
 
         Task<IActionResult> MarkMessageAsRead(Message message);
+
+        Task<IActionResult> SaveMessageChanges();
     }
 }

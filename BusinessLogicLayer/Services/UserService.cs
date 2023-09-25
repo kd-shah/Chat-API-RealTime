@@ -187,7 +187,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                     userId = user.Id,
                     name = user.Name,
                     email = user.Email,
-                    token = CreateJwt(user)
+                    token = CreateToken(user)
                 };
 
                 // Generate a token or perform any other post-authentication logic
@@ -277,8 +277,6 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             {
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
-                 //new Claim("UserId", user.UserID.ToString())
-                //new Claim(ClaimTypes.Role,"User")
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
