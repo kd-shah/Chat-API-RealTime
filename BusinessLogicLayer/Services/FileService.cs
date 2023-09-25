@@ -1,10 +1,10 @@
 ﻿ using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Models;
-using System.Net.Mail;
-using System.Runtime.InteropServices;
+using RealTimeChatApi.Hubs;
 using File = RealTimeChatApi.DataAccessLayer.Models.File;
 
 
@@ -15,12 +15,15 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
         public readonly IUserRepository _userRepository;
         public readonly IFileRepository _fileRepository;
         public readonly IMessageRepository _messageRepository;
+        private readonly IHubContext<ChatHub> _hubContext;
+        private readonly static ConnectionMapping<string> _connections = new ConnectionMapping<string>();
         public FileService(IUserRepository userRepository, IFileRepository fileRepository,
-                            IMessageRepository messageRepository)
+                            IMessageRepository messageRepository, IHubContext<ChatHub> hubContext)
         {
             _userRepository = userRepository;
             _fileRepository = fileRepository;
             _messageRepository = messageRepository;
+            _hubContext = hubContext;
         }
         public async Task<IActionResult> SendFile(SendFileRequestDto request)
         {
@@ -35,10 +38,6 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             try
             {
                 var filePath = await _fileRepository.SaveFilesLocally(request.file);
-
-
-
-
 
 
                 var message = new Message
@@ -68,7 +67,23 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 };
                 await _fileRepository.SendFile(fileMetaData);
 
-                
+                foreach (var connectionId in _connections.GetConnections(message.receiverId))
+                {
+                    try
+                    {
+                        await _hubContext.Clients.Client(connectionId).SendAsync("BroadCast", message);
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                        Console.WriteLine($"Error sending message: {ex.Message}");
+
+                    }
+
+                }
+
+
 
                 int fileId = fileMetaData.fileId;
 

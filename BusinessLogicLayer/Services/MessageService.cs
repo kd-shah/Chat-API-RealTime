@@ -6,7 +6,7 @@ using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Models;
 using RealTimeChatApi.Hubs;
-using System.Linq.Expressions;
+
 
 namespace RealTimeChatApi.BusinessLogicLayer.Services
 {
@@ -64,7 +64,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             };
 
             await _messageRepository.SendMessage(message);
-            //await _hubContext.Clients.User(receiverId).SendAsync("ReceiveMessage", request.content);
+            
 
             foreach (var connectionId in _connections.GetConnections(message.receiverId))
             {
@@ -75,9 +75,9 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 }
                 catch (Exception ex)
                 {
-                    // Log the exception
+                   
                     Console.WriteLine($"Error sending message: {ex.Message}");
-                    // Handle the exception or take appropriate action
+                  
                 }
 
             }
