@@ -2,7 +2,7 @@
 {
     public class SendFileRequestDto
     {
-        public IFormFile file { get; set; }
+        public List<IFormFile> files { get; set; }
         public string receiverId { get; set; }
 
         public string? caption { get; set; }

@@ -56,9 +56,9 @@ namespace RealTimeChatApi.DataAccessLayer.Data
             
             
             modelBuilder.Entity<Message>()
-                .HasOne(m => m.AttachedFile)
+                .HasMany(m => m.AttachedFiles)
                 .WithOne(f => f.Message)
-                .HasForeignKey<File>(f => f.messageId);
+                .HasForeignKey(f => f.messageId);
 
 
 

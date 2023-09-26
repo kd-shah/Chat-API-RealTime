@@ -8,7 +8,7 @@ namespace RealTimeChatApi.DataAccessLayer.Interfaces
 {
     public interface IFileRepository
     {
-        Task<string> SaveFilesLocally(IFormFile file);
+        Task<Dictionary<string, string>> SaveFilesLocally(IFormFile file);
 
         Task<IActionResult> SendFile(File fileMetaData);
 

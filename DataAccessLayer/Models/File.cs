@@ -11,12 +11,13 @@ namespace RealTimeChatApi.DataAccessLayer.Models
         public string fileName { get; set; }
         public long fileSize { get; set; }
 
-        public string? caption { get; set; }
         public string contentType { get; set; }
         public DateTime uploadDateTime { get; set; }
         public string senderId { get; set; }
         public string receiverId { get; set; }
         public string filePath { get; set; }
+
+        public string uniqueFileName { get; set; }
         public bool isRead { get; set; }
 
         [ForeignKey("senderId")]

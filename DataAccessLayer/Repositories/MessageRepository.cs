@@ -71,7 +71,7 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             var conversation = _context.Messages
                 .Include(m => m.sender)
                 .Include(m => m.receiver)
-                .Include(m => m.AttachedFile)
+                .Include(m => m.AttachedFiles)
                 .Where(m => (m.senderId == authenticatedUser.Id && m.receiverId == id) ||
                             (m.senderId == id && m.receiverId == authenticatedUser.Id));
 

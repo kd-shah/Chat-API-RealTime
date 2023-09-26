@@ -204,9 +204,6 @@ namespace RealTimeChatApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("fileId"));
 
-                    b.Property<string>("caption")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("contentType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -236,13 +233,16 @@ namespace RealTimeChatApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("uniqueFileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("uploadDateTime")
                         .HasColumnType("datetime2");
 
                     b.HasKey("fileId");
 
-                    b.HasIndex("messageId")
-                        .IsUnique();
+                    b.HasIndex("messageId");
 
                     b.HasIndex("receiverId");
 
@@ -287,11 +287,7 @@ namespace RealTimeChatApi.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("content")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("fileId")
-                        .HasColumnType("int");
 
                     b.Property<bool>("isRead")
                         .HasColumnType("bit");
@@ -319,8 +315,8 @@ namespace RealTimeChatApi.Migrations
             modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.File", b =>
                 {
                     b.HasOne("RealTimeChatApi.DataAccessLayer.Models.Message", "Message")
-                        .WithOne("AttachedFile")
-                        .HasForeignKey("RealTimeChatApi.DataAccessLayer.Models.File", "messageId")
+                        .WithMany("AttachedFiles")
+                        .HasForeignKey("messageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -371,8 +367,7 @@ namespace RealTimeChatApi.Migrations
 
             modelBuilder.Entity("RealTimeChatApi.DataAccessLayer.Models.Message", b =>
                 {
-                    b.Navigation("AttachedFile")
-                        .IsRequired();
+                    b.Navigation("AttachedFiles");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,4 @@
-﻿ using Microsoft.AspNetCore.Mvc;
+﻿  using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using RealTimeChatApi.BusinessLogicLayer.DTOs;
 using RealTimeChatApi.BusinessLogicLayer.Interfaces;
@@ -30,75 +30,68 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
             var authenticatedUser = await _userRepository.GetCurrentUser();
             var receiver = await _messageRepository.GetReceiver(request.receiverId);
 
-            if (request.file == null || request.receiverId == null)
+            if (request.files == null || request.receiverId == null)
             {
                 return new BadRequestObjectResult(new {Message = "Invalid"});
             }
 
             try
             {
-                var filePath = await _fileRepository.SaveFilesLocally(request.file);
-
 
                 var message = new Message
                 {
                     sender = authenticatedUser,
                     receiver = receiver,
-                    content = request.file.FileName,
                     timestamp = DateTime.Now,
+                    content = request.caption,
                     isRead = false,
                     IsFile = true,
                 };
 
                 await _messageRepository.SendMessage(message);
 
-                var fileMetaData = new File
+                foreach (var file in request.files)
                 {
-                    fileName = request.file.FileName,
-                    fileSize = request.file.Length,
-                    contentType = request.file.ContentType,
-                    caption = request.caption,
-                    sender = authenticatedUser,
-                    receiver = receiver,
-                    filePath = filePath,
-                    uploadDateTime = DateTime.Now,
-                    isRead = false,
-                    messageId = message.messageId,
-                };
-                await _fileRepository.SendFile(fileMetaData);
+                    var response = await _fileRepository.SaveFilesLocally(file);
+                    var filePath = response?["FilePath"];
+                    var uniqueFileName = response?["UniqueFileName"];
 
-                foreach (var connectionId in _connections.GetConnections(message.receiverId))
-                {
-                    try
+                    var fileMetaData = new File
                     {
-                        await _hubContext.Clients.Client(connectionId).SendAsync("BroadCast", message);
+                        fileName = file.FileName,
+                        fileSize = file.Length,
+                        contentType = file.ContentType,
+                        sender = authenticatedUser,
+                        receiver = receiver,
+                        filePath = filePath,
+                        uploadDateTime = DateTime.Now,
+                        isRead = false,
+                        messageId = message.messageId,
+                        uniqueFileName = uniqueFileName,
+                    };
+                    await _fileRepository.SendFile(fileMetaData);
+
+                    foreach (var connectionId in _connections.GetConnections(message.receiverId))
+                    {
+                        try
+                        {
+                            await _hubContext.Clients.Client(connectionId).SendAsync("BroadCast", message);
+
+                        }
+                        catch (Exception ex)
+                        {
+
+                            Console.WriteLine($"Error sending message: {ex.Message}");
+
+                        }
 
                     }
-                    catch (Exception ex)
-                    {
 
-                        Console.WriteLine($"Error sending message: {ex.Message}");
-
-                    }
-
+                    
                 }
 
+                return new OkObjectResult(new {Message = "All Files sent"});
 
-
-                int fileId = fileMetaData.fileId;
-
-                Message savedMessage = await _messageRepository.FindMessageById(message.messageId);
-
-                if (savedMessage != null)
-                {
-                    savedMessage.fileId = fileId;
-                    await _messageRepository.SaveMessageChanges();
-
-                }
-
-
-
-                return new OkObjectResult(new { File = fileMetaData });
             }
             catch (Exception ex) {
                 return new BadRequestObjectResult(new {Message = ex });

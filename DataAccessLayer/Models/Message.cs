@@ -10,7 +10,7 @@ namespace RealTimeChatApi.DataAccessLayer.Models
         public int messageId { get; set; }
         public string senderId { get; set; }
         public string receiverId { get; set; }
-        public string content { get; set; }
+        public string? content { get; set; }
         public DateTime timestamp { get; set; }
         
         public bool isRead { get; set; } 
@@ -24,9 +24,8 @@ namespace RealTimeChatApi.DataAccessLayer.Models
 
         public bool IsFile { get; set; }
         
-        public int? fileId { get; set; }
         [JsonIgnore]
-        public virtual File AttachedFile { get; set; } 
+        public virtual ICollection<File>? AttachedFiles { get; set; } 
     }
 }
 

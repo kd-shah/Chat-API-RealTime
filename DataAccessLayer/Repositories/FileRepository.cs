@@ -1,6 +1,7 @@
 ﻿using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using RealTimeChatApi.DataAccessLayer.Data;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Models;
@@ -17,16 +18,19 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             _context = context;
         }
         
-        public async Task<string> SaveFilesLocally(IFormFile file)
+        public async Task<Dictionary<string, string>> SaveFilesLocally(IFormFile file)
         {
-            var localUploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
-            if (!Directory.Exists(localUploadsFolder))
-            {
-                Directory.CreateDirectory(localUploadsFolder);
-            }
+            //var localUploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles");
+
+            //if (!Directory.Exists(localUploadsFolder))
+            //{
+            //    Directory.CreateDirectory(localUploadsFolder);
+            //}
+
+            var SharedFiles = "C:/Users/promact/Desktop/Internship/Chat Application RealTime/Frontend/RealTimeChatApp/src/assets/SharedFiles";
             var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
 
-            var filePath = Path.Combine(localUploadsFolder, uniqueFileName);
+            var filePath = Path.Combine(SharedFiles, uniqueFileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
@@ -34,7 +38,13 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             }
 
 
-            return filePath;
+            var result = new Dictionary<string, string>
+                {
+                    { "FilePath", filePath },
+                     { "UniqueFileName", uniqueFileName }
+                };
+
+            return result;
 
         }
         public async Task<IActionResult> SendFile(File fileMetaData)

@@ -6,6 +6,7 @@ using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Models;
 using RealTimeChatApi.Hubs;
+using File = RealTimeChatApi.DataAccessLayer.Models.File;
 
 
 namespace RealTimeChatApi.BusinessLogicLayer.Services
@@ -281,32 +282,41 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
 
             conversation = sort == "asc" ? conversation.OrderBy(m => m.timestamp) : conversation.OrderByDescending(m => m.timestamp);
 
-            var chat = await conversation.Select(m => new
+
+            var chat = new List<object>();
+
+            foreach (var message in conversation.Take(count))
             {
-                id = m.messageId,
-                senderId = m.senderId,
-                receiverId = m.receiverId,
-                content = m.content,
-                timestamp = m.timestamp,
-                isRead = m.isRead,
-                isFile = m.IsFile,
-                fileId = m.AttachedFile != null? m.AttachedFile.fileId : (int?)null,
-                fileName = m.AttachedFile != null? m.AttachedFile.fileName : null,
-                fileSize = m.AttachedFile !=null? m.AttachedFile.fileSize : (long?)null,
-                caption = m.AttachedFile != null ? m.AttachedFile.caption : null,
-                contentType = m.AttachedFile != null ? m.AttachedFile.contentType : null,
-                filePath= m.AttachedFile != null? m.AttachedFile.filePath : null,
-            }).Take(count).ToListAsync();
+                var attachedFiles = message.AttachedFiles != null ? await Task.WhenAll(message.AttachedFiles.Select(async file => new
+                {
+                    fileId = file.fileId,
+                    fileName = file.fileName,
+                    fileSize = file.fileSize,
+                    contentType = file.contentType,
+                    filePath = file.filePath,
+                    uniqueFileName = file.uniqueFileName,
+                })) : null;
 
-
+                chat.Add(new
+                {
+                    id = message.messageId,
+                    senderId = message.senderId,
+                    receiverId = message.receiverId,
+                    content = message.content,
+                    timestamp = message.timestamp,
+                    isRead = message.isRead,
+                    isFile = message.IsFile,
+                    AttachedFiles = attachedFiles,
+                });
+            }
 
             if (chat.Count == 0)
             {
-                //return NotFound("Conversation does not exist");
                 return new OkObjectResult(new List<object>());
             }
 
             return new OkObjectResult(chat);
+
 
 
         }
