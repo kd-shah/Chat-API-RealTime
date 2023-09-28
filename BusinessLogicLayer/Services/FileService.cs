@@ -5,7 +5,8 @@ using RealTimeChatApi.BusinessLogicLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Interfaces;
 using RealTimeChatApi.DataAccessLayer.Models;
 using RealTimeChatApi.Hubs;
-using File = RealTimeChatApi.DataAccessLayer.Models.File;
+using File = System.IO.File;
+using FileModel = RealTimeChatApi.DataAccessLayer.Models.File;
 
 
 namespace RealTimeChatApi.BusinessLogicLayer.Services
@@ -56,7 +57,7 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                     var filePath = response?["FilePath"];
                     var uniqueFileName = response?["UniqueFileName"];
 
-                    var fileMetaData = new File
+                    var fileMetaData = new FileModel
                     {
                         fileName = file.FileName,
                         fileSize = file.Length,
@@ -132,6 +133,20 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
                 FileDownloadName = file.fileName
             };
 
+        }
+
+        public async Task<IActionResult> TextFilePreview(string request)
+        {
+            var file = await _fileRepository.GetFileByName(request);
+
+            if (file == null)
+            {
+                return new NotFoundObjectResult(new { message = "File not found" });
+            }
+
+            string fileContent = File.ReadAllText(file.filePath);
+
+            return new OkObjectResult(new {fileContent = fileContent });
         }
 
 

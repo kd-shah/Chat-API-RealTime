@@ -35,5 +35,11 @@ namespace RealTimeChatApi.Controllers
         {
             return await _fileService.DownloadFile(request);
         }
+
+        [HttpGet("textFilePreview")]
+        public async Task<IActionResult> TextFilePreview([FromQuery]string request)
+        {
+            return await _fileService.TextFilePreview(request);
+        }
     }
 }

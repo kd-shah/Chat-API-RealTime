@@ -27,7 +27,8 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             //    Directory.CreateDirectory(localUploadsFolder);
             //}
 
-            var SharedFiles = "C:/Users/promact/Desktop/Internship/Chat Application RealTime/Frontend/RealTimeChatApp/src/assets/SharedFiles";
+            //var SharedFiles = "C:/Users/promact/Desktop/Internship/Chat Application RealTime/Frontend/RealTimeChatApp/src/assets/SharedFiles";
+            var SharedFiles = "C:\\Users\\kunal\\OneDrive\\Desktop\\Internship\\Frontend\\Chat-App-RealTime\\src\\assets\\SharedFiles";
             var uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
 
             var filePath = Path.Combine(SharedFiles, uniqueFileName);
@@ -72,6 +73,12 @@ namespace RealTimeChatApi.DataAccessLayer.Repositories
             return file;
         }
 
+        public async Task<File> GetFileByName(string fileName)
+        {
+            var file = _context.Files.FirstOrDefault(f => f.uniqueFileName == fileName);
+            return file;
+        }
+ 
        
     }
 }

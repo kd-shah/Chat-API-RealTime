@@ -287,6 +287,8 @@ namespace RealTimeChatApi.BusinessLogicLayer.Services
 
             foreach (var message in conversation.Take(count))
             {
+
+
                 var attachedFiles = message.AttachedFiles != null ? await Task.WhenAll(message.AttachedFiles.Select(async file => new
                 {
                     fileId = file.fileId,

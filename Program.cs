@@ -36,11 +36,12 @@ namespace RealTimeChatApi
 
 
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddNewtonsoftJson(); 
 
             builder.Services.AddSignalR();
            
-            builder.Services.AddHttpContextAccessor(); 
+            builder.Services.AddHttpContextAccessor();
+            
 
             // Register IActionContextAccessor
             builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
